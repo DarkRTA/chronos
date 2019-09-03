@@ -34,12 +34,9 @@ Hotkeys are in `./src/darkstatus.c`
 
 Colors are in `./src/color.c`
 
-The width for the layout is in `./src/darkstatus.h`
-
 
 # To Do
 
-- Implement a basic detailed timer
 - Implement global hotkeys
 
 # Will not implement

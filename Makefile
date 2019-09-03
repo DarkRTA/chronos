@@ -22,9 +22,10 @@ OBJ = src/color.o \
 	  src/components/separator.o \
 	  src/components/splits.o \
 	  src/components/sum_of_best.o \
+	  src/components/text.o \
 	  src/components/timer.o \
 	  src/components/title.o \
-	  src/components/total_playtime.o
+	  src/components/total_playtime.o \
 
 .PHONY: clean all
 .SUFFIXES:

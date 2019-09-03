@@ -33,6 +33,8 @@ static void render_component(const char *name, json_t *data)
 		render_splits(data);
 	if (strcmp(name, "SumOfBest") == 0)
 		render_sum_of_best(data);
+	if (strcmp(name, "Text") == 0)
+		render_text(data);
 	if (strcmp(name, "Timer") == 0)
 		render_timer(data);
 	if (strcmp(name, "Title") == 0)

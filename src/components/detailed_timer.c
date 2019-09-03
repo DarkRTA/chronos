@@ -33,6 +33,7 @@ static void draw_line(const char *label, json_t *data) {
 	mvprintw(y, x, "  %s", str);
 	attroff(color);
 	move(++y, 0);
+	free(str);
 }
 
 void render_detailed_timer(json_t *data)

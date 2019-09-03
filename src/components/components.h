@@ -14,5 +14,6 @@ void render_splits(json_t *data);
 void render_sum_of_best(json_t *data);
 void render_total_playtime(json_t *data);
 void render_timer(json_t *data);
+void render_text(json_t *data);
 void render_title(json_t *data);
 #endif
