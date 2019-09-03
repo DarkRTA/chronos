@@ -1,0 +1,4 @@
+*.o
+*.swp
+include/livesplit_core.h
+libs/liblivesplit_core.a
