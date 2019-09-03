@@ -5,6 +5,7 @@ void render_blank_space(json_t *data);
 void render_current_comparison(json_t *data);
 void render_current_pace(json_t *data);
 void render_delta(json_t *data);
+void render_detailed_timer(json_t *data);
 void render_pb_chance(json_t *data);
 void render_possible_time_save(json_t *data);
 void render_previous_segment(json_t *data);

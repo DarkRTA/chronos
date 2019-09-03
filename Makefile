@@ -15,6 +15,7 @@ OBJ = src/color.o \
 	  src/components/current_comparison.o \
 	  src/components/current_pace.o \
 	  src/components/delta.o \
+	  src/components/detailed_timer.o \
 	  src/components/pb_chance.o \
 	  src/components/possible_time_save.o \
 	  src/components/previous_segment.o \

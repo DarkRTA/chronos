@@ -15,6 +15,8 @@ static void render_component(const char *name, json_t *data)
 		render_blank_space(data);
 	if (strcmp(name, "Delta") == 0)
 		render_delta(data);
+	if (strcmp(name, "DetailedTimer") == 0)
+		render_detailed_timer(data);
 	if (strcmp(name, "CurrentComparison") == 0)
 		render_current_comparison(data);
 	if (strcmp(name, "CurrentPace") == 0)

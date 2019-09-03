@@ -40,12 +40,12 @@ The width for the layout is in `./src/darkstatus.h`
 # To Do
 
 - Implement a basic detailed timer
-- Implement dynamic resizing
 - Implement global hotkeys
 
 # Will not implement
 
 - The graph component (obvious reasons)
+- Detailed Timer comparisons (would get a bit cramped)
 - Double height mode for all of the components
 - Icons (obvious reasons)
 - Split editor (use one.livesplit.org)
