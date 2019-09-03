@@ -1,4 +1,5 @@
 *.o
 *.swp
+darksplit
 include/livesplit_core.h
 libs/liblivesplit_core.a

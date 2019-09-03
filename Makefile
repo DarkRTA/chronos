@@ -42,13 +42,15 @@ darksplit: $(OBJ) libs/liblivesplit_core.a
 	@$(CC) -o $@ $(OBJ) $(LDFLAGS)
 
 libs/liblivesplit_core.a:
-	mkdir -p libs
-	cd livesplit-core; \
+	@mkdir -p libs
+	@cd livesplit-core; \
+	git reset --hard; \
+	git apply --3way ../livesplit_core.patch; \
 	cargo build --release -p staticlib; \
 	cp target/release/liblivesplit_core.a ../libs/liblivesplit_core.a; \
 
 include/livesplit_core.h:
-	mkdir -p include
-	cd livesplit-core/capi/bind_gen; \
+	@mkdir -p include
+	@cd livesplit-core/capi/bind_gen; \
 	cargo run; \
 	cp ../bindings/livesplit_core.h ../../../include/livesplit_core.h; \

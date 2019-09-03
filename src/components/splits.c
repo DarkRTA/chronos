@@ -16,14 +16,13 @@ void render_splits(json_t *data)
 
 	size_t i, j;
 	const char *str;
-	int colwidth = 0; 
+	int colwidth[16] = {0};
 	json_array_foreach(splits, i, split) {
 		columns = json_object_get(split, "columns");
 		json_array_foreach(columns, j, column) {
 			str = json_value_to_string(column, "value");
 
-			colwidth = colwidth > strlen(str) ? 
-				colwidth : strlen(str);
+			colwidth[j] = MAX(colwidth[j], strlen(str));
 		}
 	}
 
@@ -39,13 +38,13 @@ void render_splits(json_t *data)
 		x = WIDTH;
 		columns = json_object_get(split, "columns");
 		json_array_foreach(columns, j, column) {
-			x -= colwidth + 1;
+			x -= colwidth[j] + 1;
 			str = json_value_to_string(column, "value");
 
 			int color = get_semantic_color(json_value_to_string(
 				column,"semantic_color"));
 			attron(color);
-			mvprintw(y, x, "%*s", colwidth + 1, str);
+			mvprintw(y, x, "%*s", colwidth[j] + 1, str);
 			attroff(color);
 		}
 		move(++y, 0);

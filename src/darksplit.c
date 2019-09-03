@@ -14,6 +14,7 @@
 
 #include "render.h"
 #include "color.h"
+int WIDTH;
 Timer timer;
 Layout layout;
 
@@ -31,6 +32,9 @@ static void loop(char *path)
 	const char *str;
 	FILE *f;
 	for (;;) {
+		int y, x;
+		getmaxyx(stdscr, y, x);
+		WIDTH = MIN(x, 50);
 		char key = getch();
 		switch (key) {
 		case ' ':
