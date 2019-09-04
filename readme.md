@@ -1,49 +1,42 @@
 # darksplit - a command line speedrun timer
 
-`darksplit` is a timer I put together in under 24 hours using livesplit-core. 
-Currently it only runs on Linux and is missing a few features I want to 
-implement but it is currently usable. Note that the code might be a bit messy
-but I did attempt to keep it somewhat clean.
+`darksplit` is a lightweight and fast speedrun timer based on livesplit-core
+that runs in your terminal. With under 1000 lines of C, you have an easily
+hackable timer that can probably run on PCs from 2010. There is no built in
+layout and split editor, but [LiveSplit One](https://one.livesplit.org) can
+be used for that purpose.
 
-# License 
+Code quality is a bit poor at the moment but a code refactor is planned after
+global hotkeys are implemented.
+
+### Usage
+
+```
+darksplit <split file> [layout file]
+```
+
+## License 
 
 Everything under ./src/ (excluding ./src/LICENSE) is licensed under the GPL 2.0 
 
-# Building
+## Building
 
 You will need the following dependencies:
 
 * `libjansson >= 2.0`
-* any ncurses version with wide character support
-* gnu make
-* a working rust compiler
-* a working c compiler
+* `libncursesw`
+* `make`
+* `rustc >= 1.37.0`
+* any c compiler with c99 support.
 
-Once you have the dependencies building is as easy as doing the following:
-
-```
-# get the submodules
-git submodule update --init --recursive
-# if all goes well the following should result in everything being built
-make
-```
+Get the submodules, edit the Makefile, then run `make`
 
 # Configuration:
 
-Hotkeys are in `./src/darkstatus.c`
+Hotkeys are in `./src/darksplit.c`
 
 Colors are in `./src/color.c`
-
 
 # To Do
 
 - Implement global hotkeys
-
-# Will not implement
-
-- The graph component (obvious reasons)
-- Detailed Timer comparisons (would get a bit cramped)
-- Double height mode for all of the components
-- Icons (obvious reasons)
-- Split editor (use one.livesplit.org)
-- Layout editor (use one.livesplit.org)
