@@ -7,8 +7,7 @@
 #include "darksplit.h"
 #include "color.h"
 
-#define json_value_to_string(obj, key) \
-	json_string_value(json_object_get((obj), (key)))
+//FIXME: make this less shitty
 void render_splits(json_t *data)
 {
 	json_t *splits = json_object_get(data, "splits");
