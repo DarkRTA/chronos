@@ -15,10 +15,6 @@ global hotkeys are implemented.
 darksplit <split file> [layout file]
 ```
 
-## License 
-
-Everything under ./src/ (excluding ./src/LICENSE) is licensed under the GPL 2.0 
-
 ## Building
 
 You will need the following dependencies:

@@ -21,7 +21,7 @@ void render_text(json_t *data)
 		text = json_string_value(json_array_get(arr, 0));
 		val = json_string_value(json_array_get(arr, 1));
 	} else {
-		text = json_value_to_string(obj, "Center");
+		text = json_obj_string(obj, "Center");
 	}
 
 	int y, x;

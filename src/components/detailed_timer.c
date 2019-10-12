@@ -26,7 +26,7 @@ static void draw_line(const char *label, json_t *data) {
 	x = WIDTH - offset;
 
 	int color = get_semantic_color(
-			json_value_to_string(data, "semantic_color"));
+			json_obj_string(data, "semantic_color"));
 
 	mvprintw(y, 0, "%.*s", WIDTH, label);
 	attron(color);

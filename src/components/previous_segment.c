@@ -11,8 +11,8 @@
 #include "color.h"
 void render_previous_segment(json_t *data)
 {
-	const char *text = json_value_to_string(data, "text");
-	const char *val = json_value_to_string(data, "time");
+	const char *text = json_obj_string(data, "text");
+	const char *val = json_obj_string(data, "time");
 
 	int offset = strlen(val) + 2;
 
@@ -21,7 +21,7 @@ void render_previous_segment(json_t *data)
 	x = WIDTH - offset;
 
 	int color = get_semantic_color(
-			json_value_to_string(data, "semantic_color"));
+			json_obj_string(data, "semantic_color"));
 
 	mvprintw(y, 0, "%.*s", WIDTH, text);
 	attron(color);

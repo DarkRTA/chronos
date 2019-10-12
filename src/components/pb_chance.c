@@ -11,8 +11,8 @@
 #include "color.h"
 void render_pb_chance(json_t *data)
 {
-	const char *text = json_value_to_string(data, "text");
-	const char *val = json_value_to_string(data, "pb_chance");
+	const char *text = json_obj_string(data, "text");
+	const char *val = json_obj_string(data, "pb_chance");
 
 	int offset = strlen(val) + 2;
 

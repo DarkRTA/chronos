@@ -11,8 +11,8 @@
 #include "color.h"
 void render_possible_time_save(json_t *data)
 {
-	const char *text = json_value_to_string(data, "text");
-	const char *val = json_value_to_string(data, "time");
+	const char *text = json_obj_string(data, "text");
+	const char *val = json_obj_string(data, "time");
 
 	int offset = strlen(val) + 2;
 

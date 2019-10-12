@@ -11,8 +11,8 @@
 #include "color.h"
 void render_current_comparison(json_t *data)
 {
-	const char *text = json_value_to_string(data, "text");
-	const char *val = json_value_to_string(data, "comparison");
+	const char *text = json_obj_string(data, "text");
+	const char *val = json_obj_string(data, "comparison");
 
 	int offset = strlen(val) + 2;
 
