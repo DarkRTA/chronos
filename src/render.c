@@ -15,7 +15,7 @@ static void render_component(const char *name, json_t *data)
 		render_blank_space(data);
 	if (strcmp(name, "DetailedTimer") == 0)
 		render_detailed_timer(data);
-	if (strcmp(name, "KeyVale") == 0)
+	if (strcmp(name, "KeyValue") == 0)
 		render_key_value(data);
 	if (strcmp(name, "Separator") == 0)
 		render_separator(data);
