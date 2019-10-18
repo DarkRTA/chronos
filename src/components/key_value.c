@@ -9,10 +9,10 @@
 
 #include "darksplit.h"
 #include "color.h"
-void render_pb_chance(json_t *data)
+void render_key_value(json_t *data)
 {
-	const char *text = json_obj_string(data, "text");
-	const char *val = json_obj_string(data, "pb_chance");
+	const char *text = json_obj_string(data, "key");
+	const char *val = json_obj_string(data, "value");
 
 	int offset = strlen(val) + 2;
 
@@ -20,7 +20,12 @@ void render_pb_chance(json_t *data)
 	getyx(stdscr, y, x);
 	x = WIDTH - offset;
 
-	mvprintw(y, 0, "%s", text);
+	int color = get_semantic_color(
+			json_obj_string(data, "semantic_color"));
+
+	mvprintw(y, 0, "%.*s", WIDTH, text);
+	attron(color);
 	mvprintw(y, x, "  %s", val);
+	attroff(color);
 	move(++y, 0);
 }

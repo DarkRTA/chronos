@@ -12,20 +12,13 @@ OBJ = src/color.o \
 	  src/darksplit.o \
 	  src/render.o \
 	  src/components/blank_space.o \
-	  src/components/current_comparison.o \
-	  src/components/current_pace.o \
-	  src/components/delta.o \
 	  src/components/detailed_timer.o \
-	  src/components/pb_chance.o \
-	  src/components/possible_time_save.o \
-	  src/components/previous_segment.o \
+	  src/components/key_value.o \
 	  src/components/separator.o \
 	  src/components/splits.o \
-	  src/components/sum_of_best.o \
 	  src/components/text.o \
 	  src/components/timer.o \
 	  src/components/title.o \
-	  src/components/total_playtime.o \
 
 .PHONY: clean all
 .SUFFIXES:
