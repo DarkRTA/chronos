@@ -1,13 +1,11 @@
 # darksplit - a command line speedrun timer
 
 `darksplit` is a lightweight and fast speedrun timer based on livesplit-core
-that runs in your terminal. With under 1000 lines of C, you have an easily
-hackable timer that can probably run on PCs from 2010. There is no built in
-layout and split editor, but [LiveSplit One](https://one.livesplit.org) can
-be used for that purpose.
+that runs in your terminal. With about 600 lines of C you are able to have a
+suprisingly usable timer that can run on a lot of hardware.
 
-Code quality is a bit poor at the moment but a code refactor is planned after
-global hotkeys are implemented.
+Code quality is a bit poor at the moment but a code refactor is planned (Will 
+probably never happen)
 
 ### Usage
 
@@ -22,17 +20,20 @@ You will need the following dependencies:
 * `libjansson >= 2.0`
 * `libncursesw`
 * `make`
-* `rustc >= 1.37.0`
+* latest stable `rustc`
 * any c compiler with c99 support.
 
 Get the submodules, edit the Makefile, then run `make`
 
 # Configuration:
 
+You are intended to configure darksplit by modifying its code.
+It is pointless to make binary packages of it for this reason.
+
 Hotkeys are in `./src/darksplit.c`
 
-Colors are in `./src/color.c`
+Colors are in `./src/color.c` (use ncurses color pairs)
 
 # To Do
 
-- Implement global hotkeys
+- Refactor the code.

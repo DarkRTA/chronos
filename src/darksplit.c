@@ -13,29 +13,52 @@
 #include "livesplit_core.h"
 
 #include "render.h"
+
 #include "color.h"
 int WIDTH;
-Timer timer;
-Layout layout;
 
+static SharedTimer stimer;
+static Layout layout;
+static HotkeySystem hotkey_system;
+
+//I should come up with a better way to configure these.
+//Make sure you dont conflict with the local hotkeys defined
+//below in the switch statement.
+static char *global_hotkeys = 
+"{"
+	"\"split\":			null,"
+	"\"reset\":			null,"
+	"\"undo\":			null,"
+	"\"skip\":			null,"
+	"\"pause\":			null,"
+	"\"undo_all_pauses\":		null,"
+	"\"previous_comparison\":	null,"
+	"\"next_comparison\":		null,"
+	"\"toggle_timing_method\":	null"
+"}";
 
 static void loop(char *path)
 {
 	initscr();
 	cbreak();
 	curs_set(0);
-	timeout(17);
+	timeout(20);
 	start_color();
 	use_default_colors();
 	init_semantic_colors();
 
 	const char *str;
+	char key;
+	int y, x;
 	FILE *f;
+	TimerWriteLock lock;
+	TimerRefMut timer;
 	for (;;) {
-		int y, x;
 		getmaxyx(stdscr, y, x);
 		WIDTH = MIN(x, 50);
-		char key = getch();
+		key = getch();
+		lock =SharedTimer_write(stimer);
+		timer = TimerWriteLock_timer(lock);
 		switch (key) {
 		case ' ':
 			Timer_split_or_start(timer);
@@ -75,8 +98,8 @@ static void loop(char *path)
 			return;
 			break;
 		}
-
 		render(Layout_state_as_json(layout, timer));
+		TimerWriteLock_drop(lock);
 		refresh();
 	}
 
@@ -92,7 +115,6 @@ static Run load_splits(const char *path)
 	ParseRunResult maybe_run = Run_parse_file_handle(fd, path, 0);
 	if(!ParseRunResult_parsed_successfully(maybe_run)) {
 		close(fd);
-		errno =	EINVAL;
 		return NULL;
 	}
 
@@ -103,39 +125,30 @@ static Run load_splits(const char *path)
 static Layout load_layout(const char *path)
 {
 	FILE *f;
-	if (path != NULL) {
-		f = fopen(path, "rb");
-		CHK_NULL(f)
-			return NULL;
+	CHK_NULL(f = fopen(path, "rb"))
+		return NULL;
 
-		CHK_ERR(fseek(f, 0, SEEK_END)) 
-			goto fail;
+	fseek(f, 0, SEEK_END);
+	long fsize = ftell(f);
+	fseek(f, 0, SEEK_SET);
 
-		long fsize = ftell(f);
+	char *string = malloc(fsize + 1);
 
-		CHK_ERR(fseek(f, 0, SEEK_SET))
-			goto fail;
-
-		char *string = malloc(fsize + 1);
-		assert(string != NULL);
-
-		CHK_ERR(fread(string, 1, fsize, f)) {
-			free(string);
-			goto fail;
-		}
-
-		fclose(f);
-
-		string[fsize] = 0;
-
-		Layout ret = Layout_parse_json(string);
+	CHK_ERR(fread(string, 1, fsize, f)) {
 		free(string);
-		return ret;
+		goto fail;
 	}
-		return Layout_default_layout();
+
+	fclose(f);
+
+	string[fsize] = 0;
+
+	Layout ret = Layout_parse_json(string);
+	free(string);
+	return ret;
 fail:
-		fclose(f);
-		return Layout_default_layout();
+	fclose(f);
+	return NULL;
 }
 
 
@@ -144,8 +157,18 @@ int main(int argc, char *argv[])
 	setlocale(LC_ALL,"");
 
 	if (argc < 2) {
-		printf("ttysplit - a command line speedrun timer\n");
+		printf("darksplit - a command line speedrun timer\n");
 		printf("usage:\n    %s <splits> [layout]\n", argv[0]);
+		return 1;
+	}
+
+	if (argc > 2) 
+		layout = load_layout(argv[2]);
+	else
+		layout = Layout_default_layout();
+	
+	CHK_NULL(layout) {
+		printf("Error loading layout");
 		return 1;
 	}
 
@@ -155,21 +178,23 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	if (argc > 2) 
-		layout = load_layout(argv[2]);
-	else
-		layout = load_layout(NULL);
-	
-	CHK_NULL(layout) {
-		printf("Error loading layout");
-		return 1;
-	}
 
-	timer = Timer_new(run);
-	
+	Timer timer = Timer_new(run);
+	stimer = Timer_into_shared(timer);
+
+	HotkeyConfig hkconfig = HotkeyConfig_parse_json(global_hotkeys);
+
+	hotkey_system = HotkeySystem_with_config(
+			SharedTimer_share(stimer),
+			hkconfig
+	);
+
+	HotkeySystem_activate(hotkey_system);
+
 	loop(argv[1]);
 
-	Timer_drop(timer);
+	SharedTimer_drop(stimer);
 	Layout_drop(layout);
+	HotkeySystem_drop(hotkey_system);
 
 }

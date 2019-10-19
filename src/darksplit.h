@@ -14,6 +14,4 @@
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
 extern int WIDTH;
-extern Timer timer;
-extern Layout layout;
 #endif
