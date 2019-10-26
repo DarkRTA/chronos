@@ -1,5 +1,5 @@
-#ifndef TTYSPLIT_TTYSPLIT_H
-#define TTYSPLIT_TTYSPLIT_H
+#ifndef DARKSPLIT_DARKSPLIT_H
+#define DARKSPLIT_DARKSPLIT_H
 
 #include "livesplit_core.h"
 
