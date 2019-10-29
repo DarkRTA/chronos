@@ -1,11 +1,8 @@
 #include "darksplit.h"
 
-#include <assert.h>
-#include <errno.h>
 #include <fcntl.h>
 #include <locale.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -57,9 +54,15 @@ static void loop(char *path)
 		getmaxyx(stdscr, y, x);
 		WIDTH = MIN(x, 50);
 		key = getch();
-		lock =SharedTimer_write(stimer);
+		lock = SharedTimer_write(stimer);
 		timer = TimerWriteLock_timer(lock);
 		switch (key) {
+		case 'o':
+			HotkeySystem_activate(hotkey_system);
+			break;
+		case 'O':
+			HotkeySystem_deactivate(hotkey_system);
+			break;
 		case ' ':
 			Timer_split_or_start(timer);
 			break;
@@ -108,49 +111,30 @@ static void loop(char *path)
 static Run load_splits(const char *path)
 {
 	int fd = open(path, O_RDONLY);
-	if (fd < 0) {
+	if (fd < 0)
 		return NULL;
-	}
 
 	ParseRunResult maybe_run = Run_parse_file_handle(fd, path, 0);
-	if(!ParseRunResult_parsed_successfully(maybe_run)) {
-		close(fd);
-		return NULL;
-	}
-
 	close(fd);
+
+	if(!ParseRunResult_parsed_successfully(maybe_run))
+		return NULL;
+
 	return ParseRunResult_unwrap(maybe_run);
 }
 
 static Layout load_layout(const char *path)
 {
-	FILE *f;
-	CHK_NULL(f = fopen(path, "rb"))
+	int fd = open(path, O_RDONLY);
+	if (fd < 0)
 		return NULL;
 
-	fseek(f, 0, SEEK_END);
-	long fsize = ftell(f);
-	fseek(f, 0, SEEK_SET);
+	Layout layout = Layout_parse_file_handle(fd);
 
-	char *string = malloc(fsize + 1);
+	close(fd);
 
-	CHK_ERR(fread(string, 1, fsize, f)) {
-		free(string);
-		goto fail;
-	}
-
-	fclose(f);
-
-	string[fsize] = 0;
-
-	Layout ret = Layout_parse_json(string);
-	free(string);
-	return ret;
-fail:
-	fclose(f);
-	return NULL;
+	return layout;
 }
-
 
 int main(int argc, char *argv[])
 {
@@ -162,10 +146,7 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	if (argc > 2) 
-		layout = load_layout(argv[2]);
-	else
-		layout = Layout_default_layout();
+	layout = (argc > 2) ? load_layout(argv[2]) : Layout_default_layout();
 	
 	CHK_NULL(layout) {
 		printf("Error loading layout");
@@ -178,15 +159,11 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-
-	Timer timer = Timer_new(run);
-	stimer = Timer_into_shared(timer);
-
-	HotkeyConfig hkconfig = HotkeyConfig_parse_json(global_hotkeys);
+	stimer = Timer_into_shared(Timer_new(run));
 
 	hotkey_system = HotkeySystem_with_config(
-			SharedTimer_share(stimer),
-			hkconfig
+		SharedTimer_share(stimer),
+		HotkeyConfig_parse_json(global_hotkeys)
 	);
 
 	HotkeySystem_activate(hotkey_system);

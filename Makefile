@@ -1,24 +1,10 @@
-CC=clang
+CC=gcc
 CFLAGS=-Isrc -Iinclude -I. -O2
 LDFLAGS=-L libs -llivesplit_core -lm -lpthread -ldl -lncursesw -ljansson
 
-DEPS = include/livesplit_core.h \
-	   src/components/components.h \
-	   src/color.h \
-	   src/render.h \
-	   src/darksplit.h \
-
-OBJ = src/color.o \
-	  src/darksplit.o \
-	  src/render.o \
-	  src/components/blank_space.o \
-	  src/components/detailed_timer.o \
-	  src/components/key_value.o \
-	  src/components/separator.o \
-	  src/components/splits.o \
-	  src/components/text.o \
-	  src/components/timer.o \
-	  src/components/title.o \
+DEPS = $(shell find src -type f -name *.h) \
+	   include/livesplit_core.h
+OBJ = $(patsubst %.c,%.o,$(shell find src -type f -name *.c))
 
 .PHONY: clean all
 .SUFFIXES:
