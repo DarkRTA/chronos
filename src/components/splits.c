@@ -5,7 +5,7 @@
 #include <jansson.h>
 
 #include "darksplit.h"
-#include "color.h"
+#include "config.h"
 
 // FIXME: make this less shitty
 // But no seriously this code is awful and I should consider rewriting it to

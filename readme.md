@@ -4,9 +4,6 @@
 that runs in your terminal. With about 600 lines of C you are able to have a
 suprisingly usable timer that can run on a lot of hardware.
 
-Code quality is a bit poor at the moment but a code refactor is planned (Will 
-probably never happen)
-
 ### Usage
 
 ```
@@ -27,13 +24,6 @@ Get the submodules, edit the Makefile, then run `make`
 
 # Configuration:
 
-You are intended to configure darksplit by modifying its code.
-It is pointless to make binary packages of it for this reason.
-
-Hotkeys are in `./src/darksplit.c`
-
-Colors are in `./src/color.c` (use ncurses color pairs)
-
-# To Do
-
-- Refactor the code.
+You are intended to configure darksplit by modifying its code. It is pointless
+to make binary packages of it for this reason. Nevertheless, most of the stuff 
+that you'd want to modify is in `config.c`.

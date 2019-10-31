@@ -8,7 +8,7 @@
 #include <jansson.h>
 
 #include "darksplit.h"
-#include "color.h"
+#include "config.h"
 void render_key_value(json_t *data)
 {
 	const char *text = json_obj_string(data, "key");

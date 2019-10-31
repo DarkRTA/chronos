@@ -10,29 +10,13 @@
 #include "livesplit_core.h"
 
 #include "render.h"
+#include "config.h"
 
-#include "color.h"
 int WIDTH;
 
 static SharedTimer stimer;
 static Layout layout;
 static HotkeySystem hotkey_system;
-
-//I should come up with a better way to configure these.
-//Make sure you dont conflict with the local hotkeys defined
-//below in the switch statement.
-static char *global_hotkeys = 
-"{"
-	"\"split\":			null,"
-	"\"reset\":			null,"
-	"\"undo\":			null,"
-	"\"skip\":			null,"
-	"\"pause\":			null,"
-	"\"undo_all_pauses\":		null,"
-	"\"previous_comparison\":	null,"
-	"\"next_comparison\":		null,"
-	"\"toggle_timing_method\":	null"
-"}";
 
 static void loop(char *path)
 {
@@ -48,54 +32,10 @@ static void loop(char *path)
 		int y, x;
 		getmaxyx(stdscr, y, x);
 		WIDTH = MIN(x, 50);
-		char key = getch();
 		TimerWriteLock lock = SharedTimer_write(stimer);
 		TimerRefMut timer = TimerWriteLock_timer(lock);
-		switch (key) {
-		case 'o':
-			HotkeySystem_activate(hotkey_system);
-			break;
-		case 'O':
-			HotkeySystem_deactivate(hotkey_system);
-			break;
-		case ' ':
-			Timer_split_or_start(timer);
-			break;
-		case 'x':
-			Timer_reset(timer, true);
-			break;
-		case 'X':
-			Timer_reset(timer, false);
-			break;
-		case 'c':
-			Timer_undo_split(timer);
-			break;
-		case 'v':
-			Timer_skip_split(timer);
-			break;
-		case 'b':
-			Timer_toggle_pause(timer);
-			break;
-		case 'n':
-			Timer_undo_all_pauses(timer);
-			break;
-		case ',':
-			Timer_switch_to_previous_comparison(timer);
-			break;
-		case '.':
-			Timer_switch_to_next_comparison(timer);
-			break;
-		case 's':; //empty statement here to allow declaration
-			const char *str = Timer_save_as_lss(timer);
-			FILE *f = fopen(path, "w");
-			fwrite(str, strlen(str), 1, f);
-			fclose(f);
-			break;
-		case 'q':
-			endwin();
-			return;
-			break;
-		}
+		char key = getch();
+		process_hotkey(key, path, timer, hotkey_system);
 		render(Layout_state_as_json(layout, timer));
 		TimerWriteLock_drop(lock);
 		refresh();
@@ -158,7 +98,7 @@ int main(int argc, char *argv[])
 
 	hotkey_system = HotkeySystem_with_config(
 		SharedTimer_share(stimer),
-		HotkeyConfig_parse_json(global_hotkeys)
+		HotkeyConfig_parse_json(GLOBAL_HOTKEYS)
 	);
 
 	loop(argv[1]);

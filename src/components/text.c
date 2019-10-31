@@ -8,7 +8,7 @@
 #include <jansson.h>
 
 #include "darksplit.h"
-#include "color.h"
+#include "config.h"
 void render_text(json_t *data)
 {
 	json_t *obj = json_object_get(data, "text");

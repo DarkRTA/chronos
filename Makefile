@@ -6,13 +6,16 @@ DEPS = $(shell find src -type f -name *.h) \
 	   include/livesplit_core.h
 OBJ = $(patsubst %.c,%.o,$(shell find src -type f -name *.c))
 
-.PHONY: clean all
+.PHONY: clean all tags
 .SUFFIXES:
 
 all: darksplit
 
 clean: 
-	@rm -v $(OBJ) darksplit
+	@rm -fv $(OBJ) darksplit
+
+tags:
+	@ctags --totals=yes --c-kinds=+defghlmpstuvxz -R include/** src/**
 
 %.o: %.c $(DEPS)
 	@echo "CC   "$<

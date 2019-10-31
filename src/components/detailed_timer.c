@@ -7,7 +7,7 @@
 #include <jansson.h>
 
 #include "darksplit.h"
-#include "color.h"
+#include "config.h"
 
 
 static void draw_line(const char *label, json_t *data) {
