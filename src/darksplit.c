@@ -44,18 +44,13 @@ static void loop(char *path)
 	use_default_colors();
 	init_semantic_colors();
 
-	const char *str;
-	char key;
-	int y, x;
-	FILE *f;
-	TimerWriteLock lock;
-	TimerRefMut timer;
 	for (;;) {
+		int y, x;
 		getmaxyx(stdscr, y, x);
 		WIDTH = MIN(x, 50);
-		key = getch();
-		lock = SharedTimer_write(stimer);
-		timer = TimerWriteLock_timer(lock);
+		char key = getch();
+		TimerWriteLock lock = SharedTimer_write(stimer);
+		TimerRefMut timer = TimerWriteLock_timer(lock);
 		switch (key) {
 		case 'o':
 			HotkeySystem_activate(hotkey_system);
@@ -90,9 +85,9 @@ static void loop(char *path)
 		case '.':
 			Timer_switch_to_next_comparison(timer);
 			break;
-		case 's':
-			str = Timer_save_as_lss(timer);
-			f = fopen(path, "w");
+		case 's':; //empty statement here to allow declaration
+			const char *str = Timer_save_as_lss(timer);
+			FILE *f = fopen(path, "w");
 			fwrite(str, strlen(str), 1, f);
 			fclose(f);
 			break;
@@ -165,8 +160,6 @@ int main(int argc, char *argv[])
 		SharedTimer_share(stimer),
 		HotkeyConfig_parse_json(global_hotkeys)
 	);
-
-	HotkeySystem_activate(hotkey_system);
 
 	loop(argv[1]);
 
