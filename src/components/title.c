@@ -20,7 +20,7 @@ void render_title(json_t *data)
 
 	int attempts = json_real_value(json_object_get(data, "attempts"));
 	int finished = json_real_value(json_object_get(data, "finished_runs"));
-	char *attstr;
+	char *attstr = "";
 
 	if (!json_is_null(json_object_get(data, "attempts"))) {
 		if (!json_is_null(json_object_get(data, "finished_runs"))) 
