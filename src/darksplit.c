@@ -40,7 +40,6 @@ static void loop(char *path)
 		TimerWriteLock_drop(lock);
 		refresh();
 	}
-
 }
 
 static Run load_splits(const char *path)
@@ -52,7 +51,7 @@ static Run load_splits(const char *path)
 	ParseRunResult maybe_run = Run_parse_file_handle(fd, path, 0);
 	close(fd);
 
-	if(!ParseRunResult_parsed_successfully(maybe_run))
+	if (!ParseRunResult_parsed_successfully(maybe_run))
 		return NULL;
 
 	return ParseRunResult_unwrap(maybe_run);
@@ -73,7 +72,7 @@ static Layout load_layout(const char *path)
 
 int main(int argc, char *argv[])
 {
-	setlocale(LC_ALL,"");
+	setlocale(LC_ALL, "");
 
 	if (argc < 2) {
 		printf("darksplit - a command line speedrun timer\n");
@@ -98,13 +97,11 @@ int main(int argc, char *argv[])
 
 	hotkey_system = HotkeySystem_with_config(
 		SharedTimer_share(stimer),
-		HotkeyConfig_parse_json(GLOBAL_HOTKEYS)
-	);
+		HotkeyConfig_parse_json(GLOBAL_HOTKEYS));
 
 	loop(argv[1]);
 
 	SharedTimer_drop(stimer);
 	Layout_drop(layout);
 	HotkeySystem_drop(hotkey_system);
-
 }

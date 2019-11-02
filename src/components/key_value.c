@@ -20,8 +20,7 @@ void render_key_value(json_t *data)
 	getyx(stdscr, y, x);
 	x = WIDTH - offset;
 
-	int color = get_semantic_color(
-			json_obj_string(data, "semantic_color"));
+	int color = get_semantic_color(json_obj_string(data, "semantic_color"));
 
 	mvprintw(y, 0, "%.*s", WIDTH, text);
 	attron(color);

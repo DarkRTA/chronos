@@ -17,12 +17,12 @@ void render_splits(json_t *data)
 
 	size_t i, j;
 	const char *str;
-	int colwidth[16] = {0};
+	int colwidth[16] = { 0 };
 	//We need to loop through the splits array in 2 passes here.
 	//This first pass is used to calculate the width of the columns.
-	json_array_foreach(splits, i, split) {
+	json_array_foreach (splits, i, split) {
 		columns = json_object_get(split, "columns");
-		json_array_foreach(columns, j, column) {
+		json_array_foreach (columns, j, column) {
 			str = json_obj_string(column, "value");
 
 			colwidth[j] = MAX(colwidth[j], strlen(str));
@@ -32,7 +32,7 @@ void render_splits(json_t *data)
 	//On the second pass, we will actually draw the splits.
 	int y, x;
 	getyx(stdscr, y, x);
-	json_array_foreach(splits, i, split) {
+	json_array_foreach (splits, i, split) {
 		//if this is the current split, use reverse video.
 		if (json_obj_bool(split, "is_current_split"))
 			attron(A_REVERSE);
@@ -44,14 +44,14 @@ void render_splits(json_t *data)
 		//this loop will draw the columns
 		x = WIDTH;
 		columns = json_object_get(split, "columns");
-		json_array_foreach(columns, j, column) {
+		json_array_foreach (columns, j, column) {
 			//move the cursor back the width of the current column
 			x -= colwidth[j] + 1;
 			str = json_obj_string(column, "value");
 
 			//get the semantic color for the column
-			int color = get_semantic_color(json_obj_string(
-				column,"semantic_color"));
+			int color = get_semantic_color(
+				json_obj_string(column, "semantic_color"));
 			//draw the column
 			attron(color);
 			mvprintw(y, x, "%*s", colwidth[j] + 1, str);

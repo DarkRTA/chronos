@@ -1,4 +1,4 @@
-#include "render.h" 
+#include "render.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -9,7 +9,7 @@
 
 #include "components/components.h"
 
-static void render_component(const char *name, json_t *data) 
+static void render_component(const char *name, json_t *data)
 {
 	if (strcmp(name, "BlankSpace") == 0)
 		render_blank_space(data);
@@ -40,10 +40,10 @@ void render(const char *json)
 	size_t index;
 	json_t *component;
 
-	json_array_foreach(array, index, component) {
+	json_array_foreach (array, index, component) {
 		const char *name;
 		json_t *data;
-		json_object_foreach(component, name, data) {
+		json_object_foreach (component, name, data) {
 			render_component(name, data);
 		}
 	}
@@ -51,5 +51,3 @@ void render(const char *json)
 	refresh();
 	json_decref(tree);
 }
-
-

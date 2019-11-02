@@ -23,11 +23,10 @@ void render_title(json_t *data)
 	char *attstr = "";
 
 	if (!json_is_null(json_object_get(data, "attempts"))) {
-		if (!json_is_null(json_object_get(data, "finished_runs"))) 
+		if (!json_is_null(json_object_get(data, "finished_runs")))
 			asprintf(&attstr, "%d / %d", finished, attempts);
-		else 
+		else
 			asprintf(&attstr, "%d", attempts);
-		
 	}
 	mvprintw(y, WIDTH - strlen(attstr) - 2, "  %s", attstr);
 	free(attstr);

@@ -79,7 +79,8 @@ static void init_color_hex(int id, int r, int g, int b)
 	init_color(id, r, g, b);
 }
 
-void init_semantic_colors() {
+void init_semantic_colors()
+{
 	// Default
 	init_pair(1, -1, -1);
 	// AheadGainingTime
@@ -100,7 +101,8 @@ void init_semantic_colors() {
 	init_pair(9, 10, -1);
 }
 
-int get_semantic_color(const char *color) {
+int get_semantic_color(const char *color)
+{
 	if (strcmp(color, "Default") == 0)
 		return 0;
 	if (strcmp(color, "AheadGainingTime") == 0)
