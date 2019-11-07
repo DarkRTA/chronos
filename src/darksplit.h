@@ -5,7 +5,8 @@
 
 #define json_obj_string(obj, key)                                              \
 	json_string_value(json_object_get((obj), (key)))
-#define json_obj_bool(obj, key) json_string_value(json_object_get((obj), (key)))
+#define json_obj_bool(obj, key)                                                \
+	json_boolean_value(json_object_get((obj), (key)))
 
 #define CHK_NULL(expr) if ((expr) == NULL)
 #define CHK_ERR(expr) if ((expr) < 0)
