@@ -81,14 +81,13 @@ int main(int argc, char *argv[])
 	}
 
 	layout = (argc > 2) ? load_layout(argv[2]) : Layout_default_layout();
-	
-	CHK_NULL(layout) {
+	if (layout == NULL) {
 		printf("Error loading layout");
 		return 1;
 	}
 
-	Run run;
-	CHK_NULL(run = load_splits(argv[1])) {
+	Run run = load_splits(argv[1]);
+	if (run == NULL) {
 		printf("Error loading splits");
 		return 1;
 	}

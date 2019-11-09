@@ -8,8 +8,6 @@
 #define json_obj_bool(obj, key)                                                \
 	json_boolean_value(json_object_get((obj), (key)))
 
-#define CHK_NULL(expr) if ((expr) == NULL)
-#define CHK_ERR(expr) if ((expr) < 0)
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
