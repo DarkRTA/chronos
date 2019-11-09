@@ -1,8 +1,8 @@
 # darksplit - a command line speedrun timer
 
-`darksplit` is a lightweight and fast speedrun timer based on livesplit-core
+`darksplit` is a lightweight and fast speedrun timer using livesplit-core
 that runs in your terminal. With about 600 lines of C you are able to have a
-suprisingly usable timer that can run on a lot of hardware.
+suprisingly usable timer that is also extremely lightweight.
 
 ### Usage
 
