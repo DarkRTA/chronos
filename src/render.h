@@ -1,5 +1,3 @@
-#ifndef DARKSPLIT_RENDER_H
-#define DARKSPLIT_RENDER_H
+#pragma once
 //this should really just be forward declared
 void render(const char *json);
-#endif

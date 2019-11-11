@@ -1,5 +1,4 @@
-#ifndef DARKSPLIT_DARKSPLIT_H
-#define DARKSPLIT_DARKSPLIT_H
+#pragma once
 
 #include "livesplit_core.h"
 
@@ -12,4 +11,3 @@
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
 extern int WIDTH;
-#endif

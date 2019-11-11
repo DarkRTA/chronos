@@ -1,5 +1,4 @@
-#ifndef DARKSPLIT_COMPONENTS_COMPONENTS_H
-#define DARKSPLIT_COMPONENTS_COMPONENTS_H
+#pragma once
 #include <jansson.h>
 void render_blank_space(json_t *data);
 void render_detailed_timer(json_t *data);
@@ -9,4 +8,3 @@ void render_splits(json_t *data);
 void render_timer(json_t *data);
 void render_text(json_t *data);
 void render_title(json_t *data);
-#endif
