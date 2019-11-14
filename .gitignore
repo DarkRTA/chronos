@@ -2,5 +2,5 @@
 *.swp
 tags
 darksplit
-include/livesplit_core.h
-libs/liblivesplit_core.a
+livesplit-core/livesplit_core.h
+livesplit-core/liblivesplit_core.a
