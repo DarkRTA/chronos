@@ -1,10 +1,10 @@
 CC=gcc
-CFLAGS=-Isrc -Ilivesplit-core -I. -O2
+CFLAGS=-Isrc -I deps -Ilivesplit-core -I. -O2
 LDFLAGS=-L livesplit-core -llivesplit_core -lm -lpthread -ldl -lncursesw -ljansson
 
-DEPS = $(shell find src -type f -name *.h) \
+DEPS = $(shell find src deps -type f -name *.h) \
 	   livesplit-core/livesplit_core.h
-OBJ = $(patsubst %.c,obj/%.o,$(shell find src -type f -name *.c))
+OBJ = $(patsubst %.c,obj/%.o,$(shell find src deps -type f -name *.c))
 
 .PHONY: clean all tags
 .SUFFIXES:
@@ -17,7 +17,8 @@ clean:
 tags:
 	@ctags --totals=yes --c-kinds=+defghlmpstuvxz -R \
 		livesplit-core/livesplit_core.h \
-		src/**
+		src/** \
+		deps/**
 
 obj/%.o: %.c $(DEPS)
 	@echo "CC   "$<

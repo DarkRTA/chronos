@@ -7,7 +7,14 @@ suprisingly usable timer that is also extremely lightweight.
 ### Usage
 
 ```
-darksplit <split file> [layout file]
+  Usage: darksplit [options]
+
+  Options:
+
+    -V, --version                 output program version
+    -h, --help                    output help information
+    -l, --layout <arg>            layout file to use
+    -s, --splits <arg>            split file to use
 ```
 
 ## Building
