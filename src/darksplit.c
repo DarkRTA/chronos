@@ -8,8 +8,9 @@
 #include <unistd.h>
 
 #include <ncurses.h>
-#include "livesplit_core.h"
-#include "commander/commander.h"
+
+#include <livesplit_core.h>
+#include <commander/commander.h>
 
 #include "render.h"
 #include "config.h"

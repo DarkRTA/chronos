@@ -1,5 +1,5 @@
 #pragma once
-#include "livesplit_core.h"
+#include <livesplit_core.h>
 
 extern const char *GLOBAL_HOTKEYS;
 void process_hotkey(const char key, const char *path, TimerRefMut timer,

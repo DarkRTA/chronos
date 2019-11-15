@@ -4,7 +4,7 @@
 #include <ncurses.h>
 
 #include "darksplit.h"
-#include "livesplit_core.h"
+#include <livesplit_core.h>
 
 //hotkeys
 const char *GLOBAL_HOTKEYS =
