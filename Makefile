@@ -1,6 +1,12 @@
-CC=gcc
-CFLAGS=-Isrc -I deps -Ilivesplit-core -I. -O2
-LDFLAGS=-L livesplit-core -llivesplit_core -lm -lpthread -ldl -lncursesw -ljansson
+CC      = gcc
+CFLAGS  = -Isrc -Ideps -Ilivesplit-core -I. -O2
+LDFLAGS = -Llivesplit-core \
+		  -llivesplit_core \
+		  -lm \
+		  -lpthread \
+		  -ldl \
+		  -lncursesw \
+		  -ljansson
 
 DEPS = $(shell find src deps -type f -name *.h) \
 	   livesplit-core/livesplit_core.h
