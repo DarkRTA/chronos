@@ -8,7 +8,7 @@ LDFLAGS = -Llivesplit-core \
 		  -lncursesw \
 		  -ljansson
 
-DEPS = $(shell find src deps -type f -name *.h) \
+DEPS = Makefile $(shell find src deps -type f -name *.h) \
 	   livesplit-core/livesplit_core.h
 OBJ = $(patsubst %.c,obj/%.o,$(shell find src deps -type f -name *.c))
 
