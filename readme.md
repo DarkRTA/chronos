@@ -21,7 +21,6 @@ suprisingly usable timer that is also extremely lightweight.
 
 You will need the following dependencies:
 
-* `libjansson >= 2.0`
 * `libncursesw`
 * `make`
 * latest stable `rustc`
@@ -34,3 +33,9 @@ Get the submodules, edit the Makefile, then run `make`
 You are intended to configure darksplit by modifying its code. It is pointless
 to make binary packages of it for this reason. Nevertheless, most of the stuff 
 that you'd want to modify is in `config.c`.
+
+# License
+
+`darksplit` is licensed under the terms of the GPL, see `LICENSE` for more info.
+
+This license does not apply to any file under `./deps/`.

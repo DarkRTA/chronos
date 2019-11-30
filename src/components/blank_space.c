@@ -2,13 +2,13 @@
 
 #include <string.h>
 #include <ncurses.h>
-#include <jansson.h>
+
+#include <cjson/cJSON.h>
 
 #include "darksplit.h"
 
-void render_blank_space(json_t *data)
+void render_blank_space(cJSON *data)
 {
-	//yeah this is all it does
 	int y, x;
 	getyx(stdscr, y, x);
 	move(++y, 0);

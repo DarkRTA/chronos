@@ -5,26 +5,28 @@
 #include <string.h>
 
 #include <ncurses.h>
-#include <jansson.h>
+
+#include <cjson/cJSON.h>
 
 #include "darksplit.h"
 #include "config.h"
-void render_key_value(json_t *data)
+void render_key_value(cJSON *data)
 {
-	const char *text = json_obj_string(data, "key");
-	const char *val = json_obj_string(data, "value");
+	const char *key = cJSON_GetObjectItem(data, "key")->valuestring;
+	const char *value = cJSON_GetObjectItem(data, "value")->valuestring;
 
-	int offset = strlen(val) + 2;
+	int offset = strlen(value) + 2;
 
 	int y, x;
 	getyx(stdscr, y, x);
 	x = WIDTH - offset;
 
-	int color = get_semantic_color(json_obj_string(data, "semantic_color"));
+	int color = get_semantic_color(
+		cJSON_GetObjectItem(data, "semantic_color")->valuestring);
 
-	mvprintw(y, 0, "%.*s", WIDTH, text);
+	mvprintw(y, 0, "%.*s", WIDTH, key);
 	attron(color);
-	mvprintw(y, x, "  %s", val);
+	mvprintw(y, x, "  %s", value);
 	attroff(color);
 	move(++y, 0);
 }

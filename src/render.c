@@ -5,11 +5,12 @@
 #include <string.h>
 
 #include <ncurses.h>
-#include <jansson.h>
+
+#include <cjson/cJSON.h>
 
 #include "components/components.h"
 
-static void render_component(const char *name, json_t *data)
+static void render_component(const char *name, cJSON *data)
 {
 	if (strcmp(name, "BlankSpace") == 0)
 		render_blank_space(data);
@@ -32,22 +33,16 @@ static void render_component(const char *name, json_t *data)
 void render(const char *json)
 {
 	erase();
-	json_error_t error;
-	json_t *tree = json_loads(json, JSON_DECODE_INT_AS_REAL, &error);
-	assert(tree != NULL);
-	json_t *array = json_object_get(tree, "components");
+	cJSON *tree = cJSON_Parse(json);
 
-	size_t index;
-	json_t *component;
+	cJSON *components = cJSON_GetObjectItem(tree, "components");
+	cJSON *component;
 
-	json_array_foreach (array, index, component) {
-		const char *name;
-		json_t *data;
-		json_object_foreach (component, name, data) {
-			render_component(name, data);
-		}
+	cJSON_ArrayForEach (component, components) {
+		cJSON *data = component->child;
+		render_component(data->string, data);
 	}
 
+	cJSON_Delete(tree);
 	refresh();
-	json_decref(tree);
 }

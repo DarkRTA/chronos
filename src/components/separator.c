@@ -2,15 +2,16 @@
 
 #include <string.h>
 #include <ncurses.h>
-#include <jansson.h>
+
+#include <cjson/cJSON.h>
 
 #include "darksplit.h"
 
-void render_separator(json_t *data)
+void render_separator(cJSON *data)
 {
 	int y, x;
 	getyx(stdscr, y, x);
-	//this should be enough dashes for most use cases
+	//TODO: dynamically allocate and use memset
 	char *str = "--------------------------------------------------------";
 	printw("%*.*s", WIDTH, WIDTH, str);
 	move(++y, 0);

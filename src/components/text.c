@@ -5,23 +5,23 @@
 #include <string.h>
 
 #include <ncurses.h>
-#include <jansson.h>
+#include <cjson/cJSON.h>
 
 #include "darksplit.h"
 #include "config.h"
-void render_text(json_t *data)
+void render_text(cJSON *data)
 {
-	json_t *obj = json_object_get(data, "text");
-	json_t *arr;
+	cJSON *obj = cJSON_GetObjectItem(data, "text");
+	cJSON *arr;
 	const char *text;
 	const char *val = "";
 
-	if (json_object_get(obj, "Center") == NULL) {
-		arr = json_object_get(obj, "Split");
-		text = json_string_value(json_array_get(arr, 0));
-		val = json_string_value(json_array_get(arr, 1));
+	if (cJSON_GetObjectItem(obj, "Center") == NULL) {
+		arr = cJSON_GetObjectItem(obj, "Split");
+		text = cJSON_GetArrayItem(arr, 0)->valuestring;
+		val = cJSON_GetArrayItem(arr, 1)->valuestring;
 	} else {
-		text = json_obj_string(obj, "Center");
+		text = cJSON_GetObjectItem(obj, "Center")->valuestring;
 	}
 
 	int y, x;

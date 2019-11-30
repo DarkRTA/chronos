@@ -1,10 +1,10 @@
 #pragma once
-#include <jansson.h>
-void render_blank_space(json_t *data);
-void render_detailed_timer(json_t *data);
-void render_key_value(json_t *data);
-void render_separator(json_t *data);
-void render_splits(json_t *data);
-void render_timer(json_t *data);
-void render_text(json_t *data);
-void render_title(json_t *data);
+#include <cjson/cJSON.h>
+void render_blank_space(cJSON *data);
+void render_detailed_timer(cJSON *data);
+void render_key_value(cJSON *data);
+void render_separator(cJSON *data);
+void render_splits(cJSON *data);
+void render_timer(cJSON *data);
+void render_text(cJSON *data);
+void render_title(cJSON *data);

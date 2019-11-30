@@ -5,8 +5,7 @@ LDFLAGS = -Llivesplit-core \
 		  -lm \
 		  -lpthread \
 		  -ldl \
-		  -lncursesw \
-		  -ljansson
+		  -lncursesw
 
 DEPS = Makefile $(shell find src deps -type f -name *.h) \
 	   livesplit-core/livesplit_core.h
