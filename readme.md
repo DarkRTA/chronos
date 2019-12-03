@@ -34,8 +34,14 @@ You are intended to configure darksplit by modifying its code. It is pointless
 to make binary packages of it for this reason. Nevertheless, most of the stuff 
 that you'd want to modify is in `config.c`.
 
-# License
+# Licensing Info
 
-`darksplit` is licensed under the terms of the GPL, see `LICENSE` for more info.
+`darksplit` is licensed under either of these two licences at your choosing:
+
+- GPL 2.0
+- MIT
+
+The text for these licenses can be found in `./LICENSE-GPL` or `./LICENSE-MIT`
+respectively.
 
 This license does not apply to any file under `./deps/`.
