@@ -22,7 +22,7 @@ void render_title(cJSON *data)
 
 	cJSON *attempts = cJSON_GetObjectItem(data, "attempts");
 	cJSON *finished = cJSON_GetObjectItem(data, "finished_runs");
-	char *attstr = "";
+	char *attstr = NULL;
 
 	if (attempts != NULL) {
 		if (finished != NULL)
@@ -30,6 +30,8 @@ void render_title(cJSON *data)
 				 attempts->valueint);
 		else
 			asprintf(&attstr, "%d", attempts->valueint);
+	} else {
+		attstr = calloc(1, 1); //single null byte
 	}
 	mvprintw(y, WIDTH - strlen(attstr) - 2, "  %s", attstr);
 	free(attstr);
