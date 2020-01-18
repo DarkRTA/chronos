@@ -1,6 +1,6 @@
-CC      = gcc
-CFLAGS  = -Isrc -Ideps -Ilivesplit-core -I. -O2
-LDFLAGS = -Llivesplit-core \
+CC      := clang
+CFLAGS  := -Isrc -Ideps -Ilivesplit-core -I. -Os
+LDFLAGS := -Llivesplit-core \
 		  -llivesplit_core \
 		  -lm \
 		  -lpthread \
@@ -13,6 +13,7 @@ OBJ = $(patsubst %.c,obj/%.o,$(shell find src deps -type f -name *.c))
 
 .PHONY: clean all tags
 .SUFFIXES:
+Q=@
 
 all: darksplit
 
@@ -27,12 +28,12 @@ tags:
 
 obj/%.o: %.c $(DEPS)
 	@echo "CC   "$<
-	@mkdir -p $(shell dirname $@)
-	@$(CC) -c -o $@ $< $(CFLAGS)
+	@mkdir -p $(@D)
+	$Q$(CC) -c -o $@ $< $(CFLAGS)
 
 darksplit: $(OBJ) livesplit-core/liblivesplit_core.a
 	@echo "LINK "$@
-	@$(CC) -o $@ $(OBJ) $(LDFLAGS)
+	$Q$(CC) -o $@ $(OBJ) $(LDFLAGS)
 
 livesplit-core/liblivesplit_core.a:
 	@cd livesplit-core/livesplit-core; \
