@@ -21,12 +21,10 @@ void render_splits(cJSON *data)
 	int colwidth[16] = { 0 };
 	//We need to loop through the splits array in 2 passes here.
 	//This first pass is used to calculate the width of the columns.
-	cJSON_ArrayForEach(split, splits)
-	{
+	cJSON_ArrayForEach (split, splits) {
 		columns = cJSON_GetObjectItem(split, "columns");
 		int j = 0;
-		cJSON_ArrayForEach(column, columns)
-		{
+		cJSON_ArrayForEach(column, columns) {
 			str = cJSON_GetObjectItem(column, "value")->valuestring;
 			colwidth[j] = MAX(colwidth[j], strlen(str));
 			j++;
@@ -36,8 +34,7 @@ void render_splits(cJSON *data)
 	//On the second pass, we will actually draw the splits.
 	int y, x;
 	getyx(stdscr, y, x);
-	cJSON_ArrayForEach(split, splits)
-	{
+	cJSON_ArrayForEach (split, splits) {
 		//if this is the current split, use reverse video.
 		if (cJSON_GetObjectItem(split, "is_current_split")->valueint)
 			attron(A_REVERSE);
@@ -50,8 +47,7 @@ void render_splits(cJSON *data)
 		x = WIDTH;
 		int j = 0;
 		columns = cJSON_GetObjectItem(split, "columns");
-		cJSON_ArrayForEach(column, columns)
-		{
+		cJSON_ArrayForEach (column, columns) {
 			//move the cursor back the width of the current column
 			x -= colwidth[j] + 1;
 			str = cJSON_GetObjectItem(column, "value")->valuestring;

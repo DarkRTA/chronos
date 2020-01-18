@@ -69,8 +69,7 @@ ExperimentalAutoDetectBinPacking: false
 #   | sed "s,^#define \([^[:space:]]*for_each[^[:space:]]*\)(.*$,  - '\1'," \
 #   | sort | uniq
 ForEachMacros:
-- 'json_array_foreach'
-- 'json_object_foreach'
+- 'cJSON_ArrayForEach'
 
 #IncludeBlocks: Preserve # Unknown to clang-format-5.0
 IncludeCategories:

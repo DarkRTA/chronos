@@ -87,15 +87,14 @@ static void load_layout(command_t *cmd)
 	close(fd);
 }
 
-
 int main(int argc, char *argv[])
 {
 	command_t cmd;
 	command_init(&cmd, argv[0], __DATE__ " " __TIME__);
 	command_option(&cmd, "-l", "--layout <arg>", "layout file to use",
-			load_layout);
+		       load_layout);
 	command_option(&cmd, "-s", "--splits <arg>", "split file to use",
-			load_splits);
+		       load_splits);
 	command_parse(&cmd, argc, argv);
 
 	if (stimer == NULL) {
