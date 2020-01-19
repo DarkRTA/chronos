@@ -21,7 +21,7 @@ const char *GLOBAL_HOTKEYS =
 "}";
 
 
-void process_hotkey(const char key, const char *path, TimerRefMut timer,
+int process_hotkey(const char key, const char *path, TimerRefMut timer,
 		    HotkeySystemRefMut hotkey_system)
 {
 	switch (key) {
@@ -65,9 +65,10 @@ void process_hotkey(const char key, const char *path, TimerRefMut timer,
 		fclose(f);
 		break;
 	case 'q':
-		endwin();
+		return 1;
 		break;
 	}
+	return 0;
 }
 
 // colors

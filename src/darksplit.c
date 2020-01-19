@@ -41,11 +41,15 @@ static void loop()
 		TimerWriteLock lock = SharedTimer_write(stimer);
 		TimerRefMut timer = TimerWriteLock_timer(lock);
 		char key = getch();
-		process_hotkey(key, path, timer, hotkey_system);
+		int brk = process_hotkey(key, path, timer, hotkey_system);
 		render(Layout_state_as_json(layout, timer));
 		TimerWriteLock_drop(lock);
 		refresh();
+		if (brk)
+			break;
 	}
+
+	endwin();
 }
 
 static void load_splits(command_t *cmd)
