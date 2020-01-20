@@ -2,18 +2,22 @@
 #include "components/components.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <ncurses.h>
 
-#include <cjson/cJSON.h>
+#include <livesplit_core.h>
 
 #include "darksplit.h"
 #include "config.h"
-void render_key_value(cJSON *data)
+void render_key_value(KeyValueComponentStateRef state)
 {
-	const char *key = cJSON_GetObjectItem(data, "key")->valuestring;
-	const char *value = cJSON_GetObjectItem(data, "value")->valuestring;
+	char *key = strdup(KeyValueComponentState_key(state));
+	char *value = strdup(KeyValueComponentState_value(state));
+
+	int color = get_semantic_color(
+		KeyValueComponentState_semantic_color(state));
 
 	int offset = strlen(value) + 2;
 
@@ -21,12 +25,12 @@ void render_key_value(cJSON *data)
 	getyx(stdscr, y, x);
 	x = WIDTH - offset;
 
-	int color = get_semantic_color(
-		cJSON_GetObjectItem(data, "semantic_color")->valuestring);
-
 	mvprintw(y, 0, "%.*s", WIDTH, key);
 	attron(color);
 	mvprintw(y, x, "  %s", value);
 	attroff(color);
 	move(++y, 0);
+
+	free(key);
+	free(value);
 }
