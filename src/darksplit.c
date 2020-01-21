@@ -23,8 +23,31 @@ static HotkeySystem hotkey_system;
 
 static const char *path = NULL;
 
-static void loop()
+static void load_splits(command_t *cmd);
+static void load_layout(command_t *cmd);
+
+static inline int process_hotkey(const char key, const char *path, TimerRefMut timer,
+		    HotkeySystemRefMut hotkey_system);
+
+int main(int argc, char *argv[])
 {
+	command_t cmd;
+	command_init(&cmd, argv[0], __DATE__ " " __TIME__);
+	command_option(&cmd, "-l", "--layout <arg>", "layout file to use",
+		       load_layout);
+	command_option(&cmd, "-s", "--splits <arg>", "split file to use",
+		       load_splits);
+	command_parse(&cmd, argc, argv);
+
+	if (stimer == NULL) {
+		puts("No splits loaded. See \"darksplit --help\"");
+		exit(1);
+	}
+
+	if (layout == NULL) {
+		layout = Layout_default_layout();
+	}
+
 	setlocale(LC_ALL, "");
 	initscr();
 	cbreak();
@@ -32,7 +55,8 @@ static void loop()
 	timeout(20);
 	start_color();
 	use_default_colors();
-	init_semantic_colors();
+
+	config_init(&hotkey_system, SharedTimer_share(stimer));
 
 	for (;;) {
 		int y, x;
@@ -50,6 +74,47 @@ static void loop()
 	}
 
 	endwin();
+
+	SharedTimer_drop(stimer);
+	Layout_drop(layout);
+	HotkeySystem_drop(hotkey_system);
+	command_free(&cmd);
+}
+
+static inline int process_hotkey(const char key, const char *path, TimerRefMut timer,
+		    HotkeySystemRefMut hotkey_system)
+{
+	if (key == CONFIG.local_hk.hks_enable)
+		HotkeySystem_activate(hotkey_system);
+	if (key == CONFIG.local_hk.hks_disable)
+		HotkeySystem_deactivate(hotkey_system);
+	if (key == CONFIG.local_hk.split)
+		Timer_split_or_start(timer);
+	if (key == CONFIG.local_hk.reset)
+		Timer_reset(timer, true);
+	if (key == CONFIG.local_hk.reset_nosave)
+		Timer_reset(timer, false);
+	if (key == CONFIG.local_hk.undo)
+		Timer_undo_split(timer);
+	if (key == CONFIG.local_hk.skip)
+		Timer_skip_split(timer);
+	if (key == CONFIG.local_hk.pause)
+		Timer_toggle_pause(timer);
+	if (key == CONFIG.local_hk.undo_pause)
+		Timer_undo_all_pauses(timer);
+	if (key == CONFIG.local_hk.prev)
+		Timer_switch_to_previous_comparison(timer);
+	if (key == CONFIG.local_hk.next)
+		Timer_switch_to_next_comparison(timer);
+	if (key == CONFIG.local_hk.save) {
+		const char *str = Timer_save_as_lss(timer);
+		FILE *f = fopen(path, "w");
+		fwrite(str, strlen(str), 1, f);
+		fclose(f);
+	}
+	if (key == CONFIG.local_hk.quit)
+		return 1;
+	return 0;
 }
 
 static void load_splits(command_t *cmd)
@@ -89,35 +154,4 @@ static void load_layout(command_t *cmd)
 	}
 
 	close(fd);
-}
-
-int main(int argc, char *argv[])
-{
-	command_t cmd;
-	command_init(&cmd, argv[0], __DATE__ " " __TIME__);
-	command_option(&cmd, "-l", "--layout <arg>", "layout file to use",
-		       load_layout);
-	command_option(&cmd, "-s", "--splits <arg>", "split file to use",
-		       load_splits);
-	command_parse(&cmd, argc, argv);
-
-	if (stimer == NULL) {
-		puts("No splits loaded. See \"darksplit --help\"");
-		exit(1);
-	}
-
-	if (layout == NULL) {
-		layout = Layout_default_layout();
-	}
-
-	hotkey_system = HotkeySystem_with_config(
-		SharedTimer_share(stimer),
-		HotkeyConfig_parse_json(GLOBAL_HOTKEYS));
-
-	loop();
-
-	SharedTimer_drop(stimer);
-	Layout_drop(layout);
-	HotkeySystem_drop(hotkey_system);
-	command_free(&cmd);
 }

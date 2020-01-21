@@ -6,69 +6,56 @@
 #include "darksplit.h"
 #include <livesplit_core.h>
 
-//hotkeys
-const char *GLOBAL_HOTKEYS =
-"{"
-	"\"split\":			null,"
-	"\"reset\":			null,"
-	"\"undo\":			null,"
-	"\"skip\":			null,"
-	"\"pause\":			null,"
-	"\"undo_all_pauses\":		null,"
-	"\"previous_comparison\":	null,"
-	"\"next_comparison\":		null,"
-	"\"toggle_timing_method\":	null"
-"}";
+struct Config CONFIG;
 
+static void init_semantic_colors();
 
-int process_hotkey(const char key, const char *path, TimerRefMut timer,
-		    HotkeySystemRefMut hotkey_system)
+static void config_default()
 {
-	switch (key) {
-	case 'o':
-		HotkeySystem_activate(hotkey_system);
-		break;
-	case 'O':
-		HotkeySystem_deactivate(hotkey_system);
-		break;
-	case ' ':
-		Timer_split_or_start(timer);
-		break;
-	case 'x':
-		Timer_reset(timer, true);
-		break;
-	case 'X':
-		Timer_reset(timer, false);
-		break;
-	case 'c':
-		Timer_undo_split(timer);
-		break;
-	case 'v':
-		Timer_skip_split(timer);
-		break;
-	case 'b':
-		Timer_toggle_pause(timer);
-		break;
-	case 'n':
-		Timer_undo_all_pauses(timer);
-		break;
-	case ',':
-		Timer_switch_to_previous_comparison(timer);
-		break;
-	case '.':
-		Timer_switch_to_next_comparison(timer);
-		break;
-	case 's':; //empty statement here to allow declaration
-		const char *str = Timer_save_as_lss(timer);
-		FILE *f = fopen(path, "w");
-		fwrite(str, strlen(str), 1, f);
-		fclose(f);
-		break;
-	case 'q':
-		return 1;
-		break;
-	}
-	return 0;
+	CONFIG.local_hk.hks_enable = 'o';
+	CONFIG.local_hk.hks_disable = 'O';
+	CONFIG.local_hk.split = ' ';
+	CONFIG.local_hk.reset = 'x';
+	CONFIG.local_hk.reset_nosave = 'X';
+	CONFIG.local_hk.undo = 'c';
+	CONFIG.local_hk.skip = 'v';
+	CONFIG.local_hk.pause = 'b';
+	CONFIG.local_hk.undo_pause = 'n';
+	CONFIG.local_hk.prev = ',';
+	CONFIG.local_hk.next = '.';
+	CONFIG.local_hk.save = 's';
+	CONFIG.local_hk.quit = 'q';
+
+	// TODO: replace when HotkeyConfig_new() gets merged
+	//hk = HotkeyConfig_new();
+	HotkeyConfig hk = HotkeyConfig_parse_json("{}");
+	//Split
+	HotkeyConfig_set_value(hk, 0, SettingValue_from_string("NumPad0"));
+	//Reset
+	HotkeyConfig_set_value(hk, 1, SettingValue_from_string("NumPad1"));
+	//Undo
+	HotkeyConfig_set_value(hk, 2, SettingValue_from_string("NumPad8"));
+	//Skip
+	HotkeyConfig_set_value(hk, 3, SettingValue_from_string("NumPad2"));
+	//Pause
+	HotkeyConfig_set_value(hk, 4, SettingValue_from_string("NumPad5"));
+	//Undo All Pauses
+	HotkeyConfig_set_value(hk, 5, SettingValue_from_string("NumPad2"));
+	//Previous Comparison
+	HotkeyConfig_set_value(hk, 6, SettingValue_from_string("NumPad4"));
+	//Next Comparison
+	HotkeyConfig_set_value(hk, 7, SettingValue_from_string("NumPad6"));
+	//Toggle timing method
+	HotkeyConfig_set_value(hk, 8, SettingValue_from_string("NumPad9"));
+	CONFIG.global_hk = hk;
+}
+
+void config_init(/*out*/ HotkeySystem *hk_sys, SharedTimer stimer)
+{
+	config_default();
+	init_semantic_colors();
+	*hk_sys = HotkeySystem_with_config(stimer, CONFIG.global_hk);
+	CONFIG.global_hk = NULL; //above function call consumed it
 }
 
 // colors
@@ -80,7 +67,7 @@ static void init_color_hex(int id, int r, int g, int b)
 	init_color(id, r, g, b);
 }
 
-void init_semantic_colors()
+static void init_semantic_colors()
 {
 	// Default
 	init_pair(1, -1, -1);
@@ -105,7 +92,7 @@ void init_semantic_colors()
 int get_semantic_color(const char *color)
 {
 	if (strcmp(color, "Default") == 0)
-		return 0;
+		return COLOR_PAIR(1);
 	if (strcmp(color, "AheadGainingTime") == 0)
 		return COLOR_PAIR(2);
 	if (strcmp(color, "AheadLosingTime") == 0)
