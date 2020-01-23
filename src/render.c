@@ -12,21 +12,21 @@
 
 static void render_component(const char *name, cJSON *data)
 {
-	if (strcmp(name, "BlankSpace") == 0)
+	if (!strcmp(name, "BlankSpace"))
 		render_blank_space(data);
-	if (strcmp(name, "DetailedTimer") == 0)
+	if (!strcmp(name, "DetailedTimer"))
 		render_detailed_timer(data);
-	if (strcmp(name, "KeyValue") == 0)
+	if (!strcmp(name, "KeyValue"))
 		render_key_value(data);
-	if (strcmp(name, "Separator") == 0)
+	if (!strcmp(name, "Separator"))
 		render_separator(data);
-	if (strcmp(name, "Splits") == 0)
+	if (!strcmp(name, "Splits"))
 		render_splits(data);
-	if (strcmp(name, "Text") == 0)
+	if (!strcmp(name, "Text"))
 		render_text(data);
-	if (strcmp(name, "Timer") == 0)
+	if (!strcmp(name, "Timer"))
 		render_timer(data);
-	if (strcmp(name, "Title") == 0)
+	if (!strcmp(name, "Title"))
 		render_title(data);
 }
 

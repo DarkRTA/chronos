@@ -91,23 +91,23 @@ static void init_semantic_colors()
 
 int get_semantic_color(const char *color)
 {
-	if (strcmp(color, "Default") == 0)
+	if (!strcmp(color, "Default"))
 		return COLOR_PAIR(1);
-	if (strcmp(color, "AheadGainingTime") == 0)
+	if (!strcmp(color, "AheadGainingTime"))
 		return COLOR_PAIR(2);
-	if (strcmp(color, "AheadLosingTime") == 0)
+	if (!strcmp(color, "AheadLosingTime"))
 		return COLOR_PAIR(3);
-	if (strcmp(color, "BehindLosingTime") == 0)
+	if (!strcmp(color, "BehindLosingTime"))
 		return COLOR_PAIR(4);
-	if (strcmp(color, "BehindGainingTime") == 0)
+	if (!strcmp(color, "BehindGainingTime"))
 		return COLOR_PAIR(5);
-	if (strcmp(color, "BestSegment") == 0)
+	if (!strcmp(color, "BestSegment"))
 		return COLOR_PAIR(6);
-	if (strcmp(color, "NotRunning") == 0)
+	if (!strcmp(color, "NotRunning"))
 		return COLOR_PAIR(7);
-	if (strcmp(color, "Paused") == 0)
+	if (!strcmp(color, "Paused"))
 		return COLOR_PAIR(8);
-	if (strcmp(color, "PersonalBest") == 0)
+	if (!strcmp(color, "PersonalBest"))
 		return COLOR_PAIR(9);
 	return 0;
 }
