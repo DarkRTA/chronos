@@ -6,11 +6,11 @@ int get_semantic_color(const char *color);
 void config_init(/*out*/ HotkeySystem *hk_sys, SharedTimer stimer);
 
 struct Color {
-	char is_rgb;
-	char id;
-	char r;
-	char g;
-	char b;
+	char rgb;
+	short id;
+	int r;
+	int g;
+	int b;
 };
 
 struct Config {
@@ -31,6 +31,8 @@ struct Config {
 	} local_hk;
 
 	HotkeyConfig global_hk;
+
+	struct Color colors[9];
 };
 
 extern struct Config CONFIG;

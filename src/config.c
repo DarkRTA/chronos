@@ -6,9 +6,20 @@
 #include "darksplit.h"
 #include <livesplit_core.h>
 
+
 struct Config CONFIG;
 
 static void init_semantic_colors();
+
+static inline void config_color(size_t i, char rgb, short id, int r, int g,
+				int b)
+{
+	CONFIG.colors[i].rgb = rgb;
+	CONFIG.colors[i].id = id;
+	CONFIG.colors[i].r = r;
+	CONFIG.colors[i].g = g;
+	CONFIG.colors[i].b = b;
+}
 
 static void config_default()
 {
@@ -48,6 +59,16 @@ static void config_default()
 	//Toggle timing method
 	HotkeyConfig_set_value(hk, 8, SettingValue_from_string("NumPad9"));
 	CONFIG.global_hk = hk;
+
+	config_color(0, 0, -1, 0, 0, 0);
+	config_color(1, 0, 12, 0, 0, 0);
+	config_color(2, 0, 4, 0, 0, 0);
+	config_color(3, 0, 9, 0, 0, 0);
+	config_color(4, 0, 9, 0, 0, 0);
+	config_color(5, 0, 10, 0, 0, 0);
+	config_color(6, 0, -1, 0, 0, 0);
+	config_color(7, 0, -1, 0, 0, 0);
+	config_color(8, 0, 10, 0, 0, 0);
 }
 
 void config_init(/*out*/ HotkeySystem *hk_sys, SharedTimer stimer)
@@ -59,34 +80,18 @@ void config_init(/*out*/ HotkeySystem *hk_sys, SharedTimer stimer)
 }
 
 // colors
-static void init_color_hex(int id, int r, int g, int b)
-{
-	r = r * 1000 / 255;
-	g = g * 1000 / 255;
-	b = b * 1000 / 255;
-	init_color(id, r, g, b);
-}
-
 static void init_semantic_colors()
 {
-	// Default
-	init_pair(1, -1, -1);
-	// AheadGainingTime
-	init_pair(2, 12, -1);
-	// AheadLosingTime
-	init_pair(3, 4, -1);
-	// BehindLosingTime
-	init_pair(4, 9, -1);
-	// BehindGainingTime
-	init_pair(5, 1, -1);
-	// BestSegment
-	init_pair(6, 10, -1);
-	// NotRunning
-	init_pair(7, -1, -1);
-	// Paused
-	init_pair(8, -1, -1);
-	// PersonalBest
-	init_pair(9, 10, -1);
+	for (int i = 0; i < 9; i++) {
+		if (CONFIG.colors[i].rgb) {
+			int r = CONFIG.colors[i].r * 1000 / 255;
+			int g = CONFIG.colors[i].g * 1000 / 255;
+			int b = CONFIG.colors[i].b * 1000 / 255;
+			init_color(CONFIG.colors[i].id, r, g, b);
+		}
+		// ncurses color pairs start at 1
+		init_pair(i + 1, CONFIG.colors[i].id, -1);
+	}
 }
 
 int get_semantic_color(const char *color)
