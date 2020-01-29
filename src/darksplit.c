@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
 		TimerRefMut timer = TimerWriteLock_timer(lock);
 		char key = getch();
 		int brk = process_hotkey(key, path, timer, hotkey_system);
-		render(Layout_state_as_json(layout, timer));
+		render(Layout_state(layout, timer));
 		TimerWriteLock_drop(lock);
 		refresh();
 		if (brk)

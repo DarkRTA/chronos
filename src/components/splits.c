@@ -4,64 +4,59 @@
 #include <string.h>
 #include <ncurses.h>
 
-#include <cjson/cJSON.h>
+#include <livesplit_core.h>
 
 #include "darksplit.h"
 #include "config.h"
 
-// FIXME: make this less shitty
-// But no seriously this code is awful and I should consider rewriting it to
-// something cleaner.
-void render_splits(cJSON *data)
+void render_splits(SplitsComponentStateRef state)
 {
-	cJSON *splits = cJSON_GetObjectItem(data, "splits");
-	cJSON *split, *columns, *column;
-
-	const char *str;
-	int colwidth[16] = { 0 };
 	//We need to loop through the splits array in 2 passes here.
 	//This first pass is used to calculate the width of the columns.
-	cJSON_ArrayForEach (split, splits) {
-		columns = cJSON_GetObjectItem(split, "columns");
-		int j = 0;
-		cJSON_ArrayForEach(column, columns) {
-			str = cJSON_GetObjectItem(column, "value")->valuestring;
-			colwidth[j] = MAX(colwidth[j], strlen(str));
-			j++;
+	int colwidth[16] = { 0 };
+
+	int len = SplitsComponentState_len(state);
+	for (int i = 0; i < len; i++) {
+		int colcount = SplitsComponentState_columns_len(state, i);
+		for (int j = 0; j < colcount; j++) {
+			int collen = strlen(
+				SplitsComponentState_column_value(state, i, j));
+			if (collen > colwidth[j])
+				colwidth[j] = collen;
 		}
 	}
 
 	//On the second pass, we will actually draw the splits.
 	int y, x;
 	getyx(stdscr, y, x);
-	cJSON_ArrayForEach (split, splits) {
+	for (int i = 0; i < len; i++) {
 		//if this is the current split, use reverse video.
-		if (cJSON_GetObjectItem(split, "is_current_split")->valueint)
+		if (SplitsComponentState_is_current_split(state, i))
 			attron(A_REVERSE);
 
 		//get the name of the split and draw it.
-		str = cJSON_GetObjectItem(split, "name")->valuestring;
-		mvprintw(y, 0, "%-*.*s", WIDTH, WIDTH, str);
+		const char *name = SplitsComponentState_name(state, i);
+		mvprintw(y, 0, "%-*.*s", WIDTH, WIDTH, name);
 
 		//this loop will draw the columns
+		int colcount = SplitsComponentState_columns_len(state, i);
 		x = WIDTH;
-		int j = 0;
-		columns = cJSON_GetObjectItem(split, "columns");
-		cJSON_ArrayForEach (column, columns) {
+		for (int j = 0; j < colcount; j++) {
 			//move the cursor back the width of the current column
 			x -= colwidth[j] + 1;
-			str = cJSON_GetObjectItem(column, "value")->valuestring;
+			char *val = strdup(
+				SplitsComponentState_column_value(state, i, j));
 
 			//get the semantic color for the column
 			int color = get_semantic_color(
-				cJSON_GetObjectItem(column, "semantic_color")
-					->valuestring);
+				SplitsComponentState_column_semantic_color(
+					state, i, j));
+
 			//draw the column
 			attron(color);
-			mvprintw(y, x, "%*s", colwidth[j] + 1, str);
+			mvprintw(y, x, "%*s", colwidth[j] + 1, val);
 			attroff(color);
-
-			j++;
+			free(val);
 		}
 		//advance to the next line and disable reverse video
 		move(++y, 0);

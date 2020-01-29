@@ -6,28 +6,21 @@
 #include <string.h>
 #include <ncurses.h>
 
-#include <cjson/cJSON.h>
+#include <livesplit_core.h>
 
 #include "darksplit.h"
 #include "config.h"
 
-static void draw_line(const char *label, cJSON *data)
+static void draw_line(const char *label, int color, char *tim, char *frac)
 {
-	const char *time_str = cJSON_GetObjectItem(data, "time")->valuestring;
-	const char *time_frac =
-		cJSON_GetObjectItem(data, "fraction")->valuestring;
-
 	char *str;
-	asprintf(&str, "%s%s", time_str, time_frac);
+	asprintf(&str, "%s%s", tim, frac);
 
 	int offset = strlen(str) + 2;
 
 	int y, x;
 	getyx(stdscr, y, x);
 	x = WIDTH - offset;
-
-	int color = get_semantic_color(
-		cJSON_GetObjectItem(data, "semantic_color")->valuestring);
 
 	mvprintw(y, 0, "%.*s", WIDTH, label);
 	attron(color);
@@ -37,8 +30,24 @@ static void draw_line(const char *label, cJSON *data)
 	free(str);
 }
 
-void render_detailed_timer(cJSON *data)
+void render_detailed_timer(DetailedTimerComponentStateRef state)
 {
-	draw_line("Time", cJSON_GetObjectItem(data, "timer"));
-	draw_line("Segment", cJSON_GetObjectItem(data, "segment_timer"));
+	char *time_time = strdup(DetailedTimerComponentState_timer_time(state));
+	char *time_frac =
+		strdup(DetailedTimerComponentState_timer_fraction(state));
+	int time_color = get_semantic_color(
+		DetailedTimerComponentState_timer_semantic_color(state));
+
+	char *seg_time =
+		strdup(DetailedTimerComponentState_segment_timer_time(state));
+	char *seg_frac = strdup(
+		DetailedTimerComponentState_segment_timer_fraction(state));
+
+	draw_line("Time", time_color, time_time, time_frac);
+	draw_line("Segment", 0, seg_time, seg_frac);
+
+	free(time_time);
+	free(time_frac);
+	free(seg_time);
+	free(seg_frac);
 }

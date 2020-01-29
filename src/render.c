@@ -6,43 +6,42 @@
 
 #include <ncurses.h>
 
-#include <cjson/cJSON.h>
-
 #include "components/components.h"
 
-static void render_component(const char *name, cJSON *data)
+
+#define GET_AND_RENDER_STATE(s, i, t) \
+	render_##t(LayoutState_component_as_##t(s, i))
+
+static void render_component(LayoutStateRef state, size_t i, 
+			     const char *type)
 {
-	if (!strcmp(name, "BlankSpace"))
-		render_blank_space(data);
-	if (!strcmp(name, "DetailedTimer"))
-		render_detailed_timer(data);
-	if (!strcmp(name, "KeyValue"))
-		render_key_value(data);
-	if (!strcmp(name, "Separator"))
-		render_separator(data);
-	if (!strcmp(name, "Splits"))
-		render_splits(data);
-	if (!strcmp(name, "Text"))
-		render_text(data);
-	if (!strcmp(name, "Timer"))
-		render_timer(data);
-	if (!strcmp(name, "Title"))
-		render_title(data);
+	if (!strcmp(type, "BlankSpace"))
+		GET_AND_RENDER_STATE(state, i, blank_space);
+	if (!strcmp(type, "DetailedTimer"))
+		GET_AND_RENDER_STATE(state, i, detailed_timer);
+	if (!strcmp(type, "KeyValue"))
+		GET_AND_RENDER_STATE(state, i, key_value);
+	if (!strcmp(type, "Separator"))
+		GET_AND_RENDER_STATE(state, i, separator);
+	if (!strcmp(type, "Splits"))
+		GET_AND_RENDER_STATE(state, i, splits);
+	if (!strcmp(type, "Text"))
+		GET_AND_RENDER_STATE(state, i, text);
+	if (!strcmp(type, "Timer"))
+		GET_AND_RENDER_STATE(state, i, timer);
+	if (!strcmp(type, "Title"))
+		GET_AND_RENDER_STATE(state, i, title);
 }
 
-void render(const char *json)
+#undef GET_AND_RENDER_STATE
+
+void render(LayoutState state)
 {
 	erase();
-	cJSON *tree = cJSON_Parse(json);
-
-	cJSON *components = cJSON_GetObjectItem(tree, "components");
-	cJSON *component;
-
-	cJSON_ArrayForEach (component, components) {
-		cJSON *data = component->child;
-		render_component(data->string, data);
+	size_t len = LayoutState_len(state);
+	for (size_t i = 0; i < len; i++) {
+		render_component(state, i, LayoutState_component_type(state, i));
 	}
-
-	cJSON_Delete(tree);
+	LayoutState_drop(state);
 	refresh();
 }

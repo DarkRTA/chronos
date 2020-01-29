@@ -1,10 +1,10 @@
 #pragma once
-#include <cjson/cJSON.h>
-void render_blank_space(cJSON *data);
-void render_detailed_timer(cJSON *data);
-void render_key_value(cJSON *data);
-void render_separator(cJSON *data);
-void render_splits(cJSON *data);
-void render_timer(cJSON *data);
-void render_text(cJSON *data);
-void render_title(cJSON *data);
+#include <livesplit_core.h>
+void render_blank_space(BlankSpaceComponentStateRef state);
+void render_detailed_timer(DetailedTimerComponentStateRef state);
+void render_key_value(KeyValueComponentStateRef state);
+void render_separator(SeparatorComponentStateRef state);
+void render_splits(SplitsComponentStateRef state);
+void render_timer(TimerComponentStateRef state);
+void render_text(TextComponentStateRef state);
+void render_title(TitleComponentStateRef state);
