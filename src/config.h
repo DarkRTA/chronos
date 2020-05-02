@@ -30,8 +30,6 @@ struct Config {
 		char quit;
 	} local_hk;
 
-	HotkeyConfig global_hk;
-
 	struct Color colors[9];
 };
 

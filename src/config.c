@@ -6,6 +6,7 @@
 #include "darksplit.h"
 #include <livesplit_core.h>
 
+// I know this is awful. Don't complain to me about it.
 
 struct Config CONFIG;
 
@@ -21,7 +22,7 @@ static inline void config_color(size_t i, char rgb, short id, int r, int g,
 	CONFIG.colors[i].b = b;
 }
 
-static void config_default()
+void config_init(/*out*/ HotkeySystem *hk_sys, SharedTimer stimer)
 {
 	CONFIG.local_hk.hks_enable = 'o';
 	CONFIG.local_hk.hks_disable = 'O';
@@ -37,9 +38,7 @@ static void config_default()
 	CONFIG.local_hk.save = 's';
 	CONFIG.local_hk.quit = 'q';
 
-	// TODO: replace when HotkeyConfig_new() gets merged
-	//hk = HotkeyConfig_new();
-	HotkeyConfig hk = HotkeyConfig_parse_json("{}");
+	HotkeyConfig hk = HotkeyConfig_new();
 	//Split
 	HotkeyConfig_set_value(hk, 0, SettingValue_from_string("NumPad0"));
 	//Reset
@@ -58,7 +57,6 @@ static void config_default()
 	HotkeyConfig_set_value(hk, 7, SettingValue_from_string("NumPad6"));
 	//Toggle timing method
 	HotkeyConfig_set_value(hk, 8, SettingValue_from_string("NumPad9"));
-	CONFIG.global_hk = hk;
 
 	config_color(0, 0, -1, 0, 0, 0);
 	config_color(1, 0, 12, 0, 0, 0);
@@ -69,14 +67,9 @@ static void config_default()
 	config_color(6, 0, -1, 0, 0, 0);
 	config_color(7, 0, -1, 0, 0, 0);
 	config_color(8, 0, 10, 0, 0, 0);
-}
 
-void config_init(/*out*/ HotkeySystem *hk_sys, SharedTimer stimer)
-{
-	config_default();
 	init_semantic_colors();
-	*hk_sys = HotkeySystem_with_config(stimer, CONFIG.global_hk);
-	CONFIG.global_hk = NULL; //above function call consumed it
+	*hk_sys = HotkeySystem_with_config(stimer, hk);
 }
 
 // colors
@@ -94,6 +87,7 @@ static void init_semantic_colors()
 	}
 }
 
+// FIXME: move this out of config
 int get_semantic_color(const char *color)
 {
 	if (!strcmp(color, "Default"))

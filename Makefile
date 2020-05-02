@@ -1,5 +1,5 @@
 CC      := clang
-CFLAGS  := -Isrc -Ideps -Ilivesplit-core -I. -Os
+CFLAGS  := -Isrc -Ideps -Ilivesplit-core -I. -Os -Wall
 LDFLAGS := -Llivesplit-core \
 		  -llivesplit_core \
 		  -lm \
