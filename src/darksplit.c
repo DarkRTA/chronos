@@ -58,6 +58,7 @@ int main(int argc, char *argv[])
 
 	config_init(&hotkey_system, SharedTimer_share(stimer));
 
+	LayoutState state = LayoutState_new();
 	for (;;) {
 		int y, x;
 		getmaxyx(stdscr, y, x);
@@ -66,13 +67,14 @@ int main(int argc, char *argv[])
 		TimerRefMut timer = TimerWriteLock_timer(lock);
 		char key = getch();
 		int brk = process_hotkey(key, path, timer, hotkey_system);
-		render(Layout_state(layout, timer));
+		Layout_update_state(layout, state, timer);
+		render(state);
 		TimerWriteLock_drop(lock);
 		refresh();
 		if (brk)
 			break;
 	}
-
+	LayoutState_drop(state);
 	endwin();
 
 	SharedTimer_drop(stimer);

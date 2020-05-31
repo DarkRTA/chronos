@@ -35,13 +35,12 @@ static void render_component(LayoutStateRef state, size_t i,
 
 #undef GET_AND_RENDER_STATE
 
-void render(LayoutState state)
+void render(LayoutStateRef state)
 {
 	erase();
 	size_t len = LayoutState_len(state);
 	for (size_t i = 0; i < len; i++) {
 		render_component(state, i, LayoutState_component_type(state, i));
 	}
-	LayoutState_drop(state);
 	refresh();
 }
