@@ -36,12 +36,5 @@ that you'd want to modify is in `config.c`.
 
 # Licensing Info
 
-`darksplit` is licensed under either of these two licences at your choosing:
-
-- GPL 2.0
-- MIT
-
-The text for these licenses can be found in `./LICENSE-GPL` or `./LICENSE-MIT`
-respectively.
-
-This license does not apply to any file under `./deps/`.
+`darksplit` is licensed under the GNU GPL 2.0. See `./LICENSE` for the full
+details.
