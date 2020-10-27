@@ -1,15 +1,13 @@
 CC      := clang
-CFLAGS  := -Isrc -Ideps -Ilivesplit-core -I. -Os -Wall
+CFLAGS  := -Isrc -Ideps -Ilivesplit-core -I. -Wall -MMD
 LDFLAGS := -Llivesplit-core \
 		  -llivesplit_core \
 		  -lm \
 		  -lpthread \
 		  -ldl \
 		  -lncursesw
-
-DEPS = Makefile $(shell find src deps -type f -name *.h) \
-	   livesplit-core/livesplit_core.h
 OBJ = $(patsubst %.c,obj/%.o,$(shell find src deps -type f -name *.c))
+DEPS = $(patsubst %.o,%.d,$(OBJ))
 
 .PHONY: clean all tags
 .SUFFIXES:
@@ -26,10 +24,13 @@ tags:
 		src/** \
 		deps/**
 
-obj/%.o: %.c $(DEPS)
+obj/%.o: %.c obj/%.d
 	@echo "CC   "$<
 	@mkdir -p $(@D)
 	$Q$(CC) -c -o $@ $< $(CFLAGS)
+
+$(DEPS): ;
+include $(DEPS)
 
 darksplit: $(OBJ) livesplit-core/liblivesplit_core.a
 	@echo "LINK "$@
