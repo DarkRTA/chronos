@@ -24,7 +24,7 @@ tags:
 		src/** \
 		deps/**
 
-obj/%.o: %.c obj/%.d
+obj/%.o: %.c obj/%.d livesplit-core/livesplit_core.h
 	@echo "CC   "$<
 	@mkdir -p $(@D)
 	$Q$(CC) -c -o $@ $< $(CFLAGS)
