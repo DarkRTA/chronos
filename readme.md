@@ -1,8 +1,8 @@
 # chronos - a command line speedrun timer
 
 `chronos` is a lightweight and fast speedrun timer using livesplit-core
-that runs in your terminal. With about 600 lines of C you are able to have a
-suprisingly usable timer that is also extremely lightweight.
+that runs in your terminal. With only about 900 lines of C, it is also 
+really easy to modify for your needs.
 
 ### Usage
 
@@ -27,8 +27,3 @@ You will need the following dependencies:
 * any c compiler with c99 support.
 
 Get the submodules, edit the Makefile, then run `make`
-
-# Licensing Info
-
-`chronos` is licensed under the GNU GPL 2.0. See `./LICENSE` for the full
-details.

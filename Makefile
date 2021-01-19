@@ -1,4 +1,4 @@
-CC      := cc
+CC      := cc 
 CFLAGS  := -Isrc -Ideps -Ilivesplit-core -I. -Wall -MMD -O2
 LDFLAGS := -Llivesplit-core \
 		  -llivesplit_core \
