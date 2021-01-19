@@ -1,28 +1,18 @@
 #include "config.h"
 
+#include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
-#include <ncurses.h>
 
-#include "darksplit.h"
+#include "chronos.h"
 #include <livesplit_core.h>
+#include <termbox/termbox.h>
 
 // I know this is awful. Don't complain to me about it.
 
 struct Config CONFIG;
 
-static void init_semantic_colors();
-
-static inline void config_color(size_t i, char rgb, short id, int r, int g,
-				int b)
-{
-	CONFIG.colors[i].rgb = rgb;
-	CONFIG.colors[i].id = id;
-	CONFIG.colors[i].r = r;
-	CONFIG.colors[i].g = g;
-	CONFIG.colors[i].b = b;
-}
-
-void config_init(/*out*/ HotkeySystem *hk_sys, SharedTimer stimer)
+void config_init()
 {
 	CONFIG.local_hk.hks_enable = 'o';
 	CONFIG.local_hk.hks_disable = 'O';
@@ -38,75 +28,156 @@ void config_init(/*out*/ HotkeySystem *hk_sys, SharedTimer stimer)
 	CONFIG.local_hk.save = 's';
 	CONFIG.local_hk.quit = 'q';
 
-	HotkeyConfig hk = HotkeyConfig_new();
+	CONFIG.global_hk = HotkeyConfig_new();
 	//Split
-	HotkeyConfig_set_value(hk, 0, SettingValue_from_string("NumPad0"));
+	HotkeyConfig_set_value(
+		CONFIG.global_hk,
+		0,
+		SettingValue_from_string("NumPad0"));
 	//Reset
-	HotkeyConfig_set_value(hk, 1, SettingValue_from_string("NumPad1"));
+	HotkeyConfig_set_value(
+		CONFIG.global_hk,
+		1,
+		SettingValue_from_string("NumPad1"));
 	//Undo
-	HotkeyConfig_set_value(hk, 2, SettingValue_from_string("NumPad8"));
+	HotkeyConfig_set_value(
+		CONFIG.global_hk,
+		2,
+		SettingValue_from_string("NumPad8"));
 	//Skip
-	HotkeyConfig_set_value(hk, 3, SettingValue_from_string("NumPad2"));
+	HotkeyConfig_set_value(
+		CONFIG.global_hk,
+		3,
+		SettingValue_from_string("NumPad2"));
 	//Pause
-	HotkeyConfig_set_value(hk, 4, SettingValue_from_string("NumPad5"));
+	HotkeyConfig_set_value(
+		CONFIG.global_hk,
+		4,
+		SettingValue_from_string("NumPad5"));
 	//Undo All Pauses
-	HotkeyConfig_set_value(hk, 5, SettingValue_from_string("NumPad2"));
+	HotkeyConfig_set_value(
+		CONFIG.global_hk,
+		5,
+		SettingValue_from_string("NumPad2"));
 	//Previous Comparison
-	HotkeyConfig_set_value(hk, 6, SettingValue_from_string("NumPad4"));
+	HotkeyConfig_set_value(
+		CONFIG.global_hk,
+		6,
+		SettingValue_from_string("NumPad4"));
 	//Next Comparison
-	HotkeyConfig_set_value(hk, 7, SettingValue_from_string("NumPad6"));
+	HotkeyConfig_set_value(
+		CONFIG.global_hk,
+		7,
+		SettingValue_from_string("NumPad6"));
 	//Toggle timing method
-	HotkeyConfig_set_value(hk, 8, SettingValue_from_string("NumPad9"));
+	HotkeyConfig_set_value(
+		CONFIG.global_hk,
+		8,
+		SettingValue_from_string("NumPad9"));
 
-	config_color(0, 0, -1, 0, 0, 0);
-	config_color(1, 0, 12, 0, 0, 0);
-	config_color(2, 0, 4, 0, 0, 0);
-	config_color(3, 0, 9, 0, 0, 0);
-	config_color(4, 0, 9, 0, 0, 0);
-	config_color(5, 0, 10, 0, 0, 0);
-	config_color(6, 0, -1, 0, 0, 0);
-	config_color(7, 0, -1, 0, 0, 0);
-	config_color(8, 0, 10, 0, 0, 0);
-
-	init_semantic_colors();
-	*hk_sys = HotkeySystem_with_config(stimer, hk);
+	CONFIG.color.default_color = 0;
+	CONFIG.color.ahead_gaining_time = 41;
+	CONFIG.color.ahead_losing_time = 78;
+	CONFIG.color.behind_losing_time = 160;
+	CONFIG.color.behind_gaining_time = 167;
+	CONFIG.color.best_segment = 220;
+	CONFIG.color.not_running = 145;
+	CONFIG.color.paused = 102;
+	CONFIG.color.personal_best = 39;
 }
 
-// colors
-static void init_semantic_colors()
+#define LOCAL_HK(k)                                                            \
+	do {                                                                   \
+		if (!strcmp(section, "local_hotkeys") && !strcmp(name, #k)) {  \
+			CONFIG.local_hk.k = value[0];                          \
+		}                                                              \
+	} while (0)
+
+#define GLOBAL_HK(i, k)                                                        \
+	do {                                                                   \
+		if (!strcmp(section, "global_hotkeys") && !strcmp(name, #k)) { \
+			HotkeyConfig_set_value(                                \
+				CONFIG.global_hk,                              \
+				i,                                             \
+				SettingValue_from_string(value));              \
+		}                                                              \
+	} while (0)
+
+#define COLOR(k)                                                               \
+	do {                                                                   \
+		if (!strcmp(section, "colors") && !strcmp(name, #k)) {         \
+			CONFIG.color.k = atoi(value);                          \
+		}                                                              \
+	} while (0)
+
+int config_ini_handler(
+	void *d, const char *section, const char *name, const char *value)
 {
-	for (int i = 0; i < 9; i++) {
-		if (CONFIG.colors[i].rgb) {
-			int r = CONFIG.colors[i].r * 1000 / 255;
-			int g = CONFIG.colors[i].g * 1000 / 255;
-			int b = CONFIG.colors[i].b * 1000 / 255;
-			init_color(CONFIG.colors[i].id, r, g, b);
-		}
-		// ncurses color pairs start at 1
-		init_pair(i + 1, CONFIG.colors[i].id, -1);
+	//empty values should be treated as a single space
+	if (!strcmp("", value)) {
+		value = " ";
 	}
+
+	LOCAL_HK(hks_enable);
+	LOCAL_HK(hks_disable);
+	LOCAL_HK(split);
+	LOCAL_HK(reset);
+	LOCAL_HK(reset_nosave);
+	LOCAL_HK(undo);
+	LOCAL_HK(skip);
+	LOCAL_HK(pause);
+	LOCAL_HK(undo_pause);
+	LOCAL_HK(next);
+	LOCAL_HK(prev);
+	LOCAL_HK(save);
+	LOCAL_HK(quit);
+
+	GLOBAL_HK(0, split);
+	GLOBAL_HK(1, reset);
+	GLOBAL_HK(2, undo);
+	GLOBAL_HK(3, skip);
+	GLOBAL_HK(4, pause);
+	GLOBAL_HK(5, undo_pause);
+	GLOBAL_HK(6, next);
+	GLOBAL_HK(7, prev);
+	GLOBAL_HK(8, timing_method);
+
+	COLOR(default_color);
+	COLOR(ahead_gaining_time);
+	COLOR(ahead_losing_time);
+	COLOR(behind_losing_time);
+	COLOR(behind_gaining_time);
+	COLOR(best_segment);
+	COLOR(not_running);
+	COLOR(paused);
+	COLOR(personal_best);
+
+	return 0;
 }
 
-// FIXME: move this out of config
-int get_semantic_color(const char *color)
+#undef LOCAL_HK
+#undef GLOBAL_HK
+#undef COLOR
+
+uint16_t config_get_semantic_color(const char *color)
 {
 	if (!strcmp(color, "Default"))
-		return COLOR_PAIR(1);
+		return CONFIG.color.default_color;
 	if (!strcmp(color, "AheadGainingTime"))
-		return COLOR_PAIR(2);
+		return CONFIG.color.ahead_gaining_time;
 	if (!strcmp(color, "AheadLosingTime"))
-		return COLOR_PAIR(3);
+		return CONFIG.color.ahead_losing_time;
 	if (!strcmp(color, "BehindLosingTime"))
-		return COLOR_PAIR(4);
+		return CONFIG.color.behind_losing_time;
 	if (!strcmp(color, "BehindGainingTime"))
-		return COLOR_PAIR(5);
+		return CONFIG.color.behind_gaining_time;
 	if (!strcmp(color, "BestSegment"))
-		return COLOR_PAIR(6);
+		return CONFIG.color.best_segment;
 	if (!strcmp(color, "NotRunning"))
-		return COLOR_PAIR(7);
+		return CONFIG.color.not_running;
 	if (!strcmp(color, "Paused"))
-		return COLOR_PAIR(8);
+		return CONFIG.color.paused;
 	if (!strcmp(color, "PersonalBest"))
-		return COLOR_PAIR(9);
+		return CONFIG.color.personal_best;
 	return 0;
 }

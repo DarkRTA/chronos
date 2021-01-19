@@ -1,11 +1,10 @@
-CC      := clang
-CFLAGS  := -Isrc -Ideps -Ilivesplit-core -I. -Wall -MMD
+CC      := cc
+CFLAGS  := -Isrc -Ideps -Ilivesplit-core -I. -Wall -MMD -O2
 LDFLAGS := -Llivesplit-core \
 		  -llivesplit_core \
 		  -lm \
 		  -lpthread \
-		  -ldl \
-		  -lncursesw
+		  -ldl 
 OBJ = $(patsubst %.c,obj/%.o,$(shell find src deps -type f -name *.c))
 DEPS = $(patsubst %.o,%.d,$(OBJ))
 
@@ -13,10 +12,10 @@ DEPS = $(patsubst %.o,%.d,$(OBJ))
 .SUFFIXES:
 Q=@
 
-all: darksplit
+all: chronos
 
 clean: 
-	@rm -rfv obj darksplit
+	@rm -rfv obj chronos
 
 tags:
 	@ctags --totals=yes --c-kinds=+defghlmpstuvxz -R \
@@ -32,7 +31,7 @@ obj/%.o: %.c obj/%.d livesplit-core/livesplit_core.h
 $(DEPS): ;
 include $(DEPS)
 
-darksplit: $(OBJ) livesplit-core/liblivesplit_core.a
+chronos: $(OBJ) livesplit-core/liblivesplit_core.a
 	@echo "LINK "$@
 	$Q$(CC) -o $@ $(OBJ) $(LDFLAGS)
 

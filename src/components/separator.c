@@ -2,19 +2,16 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include <ncurses.h>
+#include <termbox/termbox.h>
 
 #include <livesplit_core.h>
 
-#include "darksplit.h"
+#include "chronos.h"
 
-void render_separator(SeparatorComponentStateRef state)
+void render_separator(SeparatorComponentStateRef state, int *line)
 {
-	int y, x;
-	getyx(stdscr, y, x);
-	char *str = calloc(WIDTH + 1, 1);
-	memset(str, '-', WIDTH);
-	printw("%s", str);
-	move(++y, 0);
-	free(str);
+	for (int i = 0; i < WIDTH; i++) {
+		tb_change_cell(i, *line, '-', 0, 0);
+	}
+	(*line)++;
 }

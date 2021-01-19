@@ -2,14 +2,15 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <ncurses.h>
+#include <termbox/termbox.h>
 
 #include <livesplit_core.h>
 
-#include "darksplit.h"
+#include "chronos.h"
+#include "tb_extras.h"
 #include "config.h"
 
-void render_splits(SplitsComponentStateRef state)
+void render_splits(SplitsComponentStateRef state, int *line)
 {
 	//We need to loop through the splits array in 2 passes here.
 	//This first pass is used to calculate the width of the columns.
@@ -27,20 +28,22 @@ void render_splits(SplitsComponentStateRef state)
 	}
 
 	//On the second pass, we will actually draw the splits.
-	int y, x;
-	getyx(stdscr, y, x);
 	for (int i = 0; i < len; i++) {
 		//if this is the current split, use reverse video.
-		if (SplitsComponentState_is_current_split(state, i))
-			attron(A_REVERSE);
+		uint16_t attr = SplitsComponentState_is_current_split(state, i)
+			? TB_REVERSE
+			: 0;
 
 		//get the name of the split and draw it.
 		const char *name = SplitsComponentState_name(state, i);
-		mvprintw(y, 0, "%-*.*s", WIDTH, WIDTH, name);
+		for (int k = 0; k < WIDTH; k++) {
+			tb_change_cell(k, *line, ' ', attr, 0);
+		}
+		tb_put_string(0, *line, name, attr, 0);
 
 		//this loop will draw the columns
 		int colcount = SplitsComponentState_columns_len(state, i);
-		x = WIDTH;
+		int x = WIDTH;
 		for (int j = 0; j < colcount; j++) {
 			//move the cursor back the width of the current column
 			x -= colwidth[j] + 1;
@@ -48,18 +51,25 @@ void render_splits(SplitsComponentStateRef state)
 				SplitsComponentState_column_value(state, i, j));
 
 			//get the semantic color for the column
-			int color = get_semantic_color(
+			int color = config_get_semantic_color(
 				SplitsComponentState_column_semantic_color(
-					state, i, j));
+					state,
+					i,
+					j));
 
 			//draw the column
-			attron(color);
-			mvprintw(y, x, "%*s", colwidth[j] + 1, val);
-			attroff(color);
+			for (int k = x; k < x + colwidth[j] + 1; k++) {
+				tb_change_cell(k, *line, ' ', color | attr, 0);
+			}
+			tb_put_string(
+				x + (colwidth[j] - strlen(val)) + 1,
+				*line,
+				val,
+				color | attr,
+				0);
 			free(val);
 		}
-		//advance to the next line and disable reverse video
-		move(++y, 0);
-		attroff(A_REVERSE);
+		//advance to the next line
+		(*line)++;
 	}
 }

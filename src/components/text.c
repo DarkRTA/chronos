@@ -5,12 +5,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <ncurses.h>
+#include <termbox/termbox.h>
 #include <livesplit_core.h>
 
-#include "darksplit.h"
+#include "chronos.h"
+#include "tb_extras.h"
 #include "config.h"
-void render_text(TextComponentStateRef state)
+
+void render_text(TextComponentStateRef state, int *line)
 {
 	char *left = NULL;
 	char *right = NULL;
@@ -23,15 +25,15 @@ void render_text(TextComponentStateRef state)
 		right = calloc(1, 1); //single null byte
 	}
 
-	int y, x;
-	getyx(stdscr, y, x);
-	mvprintw(y, 0, "%s", left);
+	tb_put_string(0, *line, left, 0, 0);
+
 	if (strlen(right) != 0) {
-		int offset = strlen(right) + 2;
-		x = WIDTH - offset;
-		mvprintw(y, x, "  %s", right);
+		int x = WIDTH - strlen(right);
+		tb_put_string(x - 2, *line, "  ", 0, 0);
+		tb_put_string(x, *line, right, 0, 0);
 	}
-	move(++y, 0);
+
+	*line += 1;
 
 	free(right);
 	free(left);

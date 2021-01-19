@@ -1,18 +1,19 @@
-# darksplit - a command line speedrun timer
+# chronos - a command line speedrun timer
 
-`darksplit` is a lightweight and fast speedrun timer using livesplit-core
+`chronos` is a lightweight and fast speedrun timer using livesplit-core
 that runs in your terminal. With about 600 lines of C you are able to have a
 suprisingly usable timer that is also extremely lightweight.
 
 ### Usage
 
 ```
-  Usage: darksplit [options]
+  Usage: ./chronos [options]
 
   Options:
 
     -V, --version                 output program version
     -h, --help                    output help information
+    -c, --config <arg>            config file to use
     -l, --layout <arg>            layout file to use
     -s, --splits <arg>            split file to use
 ```
@@ -21,20 +22,13 @@ suprisingly usable timer that is also extremely lightweight.
 
 You will need the following dependencies:
 
-* `libncursesw`
 * `make`
 * latest stable `rustc`
 * any c compiler with c99 support.
 
 Get the submodules, edit the Makefile, then run `make`
 
-# Configuration:
-
-You are intended to configure darksplit by modifying its code. It is pointless
-to make binary packages of it for this reason. Nevertheless, most of the stuff 
-that you'd want to modify is in `config.c`.
-
 # Licensing Info
 
-`darksplit` is licensed under the GNU GPL 2.0. See `./LICENSE` for the full
+`chronos` is licensed under the GNU GPL 2.0. See `./LICENSE` for the full
 details.

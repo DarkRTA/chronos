@@ -5,31 +5,29 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <ncurses.h>
+#include <termbox/termbox.h>
 
 #include <livesplit_core.h>
 
-#include "darksplit.h"
+#include "tb_extras.h"
+#include "chronos.h"
 #include "config.h"
-void render_key_value(KeyValueComponentStateRef state)
+
+void render_key_value(KeyValueComponentStateRef state, int *line)
 {
 	char *key = strdup(KeyValueComponentState_key(state));
 	char *value = strdup(KeyValueComponentState_value(state));
 
-	int color = get_semantic_color(
+	int color = config_get_semantic_color(
 		KeyValueComponentState_semantic_color(state));
 
-	int offset = strlen(value) + 2;
+	int x = WIDTH - strlen(value);
 
-	int y, x;
-	getyx(stdscr, y, x);
-	x = WIDTH - offset;
+	tb_put_string(0, *line, key, 0, 0);
+	tb_put_string(x - 2, *line, "  ", 0, 0);
+	tb_put_string(x, *line, value, color, 0);
 
-	mvprintw(y, 0, "%.*s", WIDTH, key);
-	attron(color);
-	mvprintw(y, x, "  %s", value);
-	attroff(color);
-	move(++y, 0);
+	*line += 1;
 
 	free(key);
 	free(value);

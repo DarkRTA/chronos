@@ -2,6 +2,6 @@
 obj
 *.swp
 tags
-darksplit
+chronos
 livesplit-core/livesplit_core.h
 livesplit-core/liblivesplit_core.a

@@ -1,4 +1,4 @@
-#include "darksplit.h"
+#include "chronos.h"
 
 #include <fcntl.h>
 #include <locale.h>
@@ -7,10 +7,10 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <ncurses.h>
-
 #include <livesplit_core.h>
 #include <commander/commander.h>
+#include <termbox/termbox.h>
+#include <inih/ini.h>
 
 #include "render.h"
 #include "config.h"
@@ -18,29 +18,48 @@
 int WIDTH;
 
 static SharedTimer stimer = NULL;
-static Layout layout      = NULL;
+static Layout layout = NULL;
 static HotkeySystem hotkey_system;
 
 static const char *path = NULL;
 
 static void load_splits(command_t *cmd);
 static void load_layout(command_t *cmd);
+static void load_config(command_t *cmd);
 
-static inline int process_hotkey(const char key, const char *path, TimerRefMut timer,
-		    HotkeySystemRefMut hotkey_system);
+static inline int process_hotkey(
+	const char key, const char *path, TimerRefMut timer,
+	HotkeySystemRefMut hotkey_system);
+static inline int get_key(int timeout);
 
 int main(int argc, char *argv[])
 {
+	config_init();
+
 	command_t cmd;
 	command_init(&cmd, argv[0], __DATE__ " " __TIME__);
-	command_option(&cmd, "-l", "--layout <arg>", "layout file to use",
-		       load_layout);
-	command_option(&cmd, "-s", "--splits <arg>", "split file to use",
-		       load_splits);
+	command_option(
+		&cmd,
+		"-c",
+		"--config <arg>",
+		"config file to use",
+		load_config);
+	command_option(
+		&cmd,
+		"-l",
+		"--layout <arg>",
+		"layout file to use",
+		load_layout);
+	command_option(
+		&cmd,
+		"-s",
+		"--splits <arg>",
+		"split file to use",
+		load_splits);
 	command_parse(&cmd, argc, argv);
 
 	if (stimer == NULL) {
-		puts("No splits loaded. See \"darksplit --help\"");
+		puts("No splits loaded. See \"chronos --help\"");
 		exit(1);
 	}
 
@@ -48,34 +67,28 @@ int main(int argc, char *argv[])
 		layout = Layout_default_layout();
 	}
 
-	setlocale(LC_ALL, "");
-	initscr();
-	cbreak();
-	curs_set(0);
-	timeout(20);
-	start_color();
-	use_default_colors();
+	tb_init();
+	tb_select_output_mode(TB_OUTPUT_256);
 
-	config_init(&hotkey_system, SharedTimer_share(stimer));
+	hotkey_system = HotkeySystem_with_config(
+		SharedTimer_share(stimer),
+		CONFIG.global_hk);
 
 	LayoutState state = LayoutState_new();
 	for (;;) {
-		int y, x;
-		getmaxyx(stdscr, y, x);
-		WIDTH = MIN(x, 50);
+		WIDTH = MIN(tb_width(), 50);
+		char key = get_key(20);
 		TimerWriteLock lock = SharedTimer_write(stimer);
 		TimerRefMut timer = TimerWriteLock_timer(lock);
-		char key = getch();
 		int brk = process_hotkey(key, path, timer, hotkey_system);
 		Layout_update_state(layout, state, timer);
-		render(state);
 		TimerWriteLock_drop(lock);
-		refresh();
+		render(state);
 		if (brk)
 			break;
 	}
 	LayoutState_drop(state);
-	endwin();
+	tb_shutdown();
 
 	SharedTimer_drop(stimer);
 	Layout_drop(layout);
@@ -83,8 +96,19 @@ int main(int argc, char *argv[])
 	command_free(&cmd);
 }
 
-static inline int process_hotkey(const char key, const char *path, TimerRefMut timer,
-		    HotkeySystemRefMut hotkey_system)
+static inline int get_key(int timeout)
+{
+	struct tb_event event;
+	if (tb_peek_event(&event, timeout) == TB_EVENT_KEY) {
+		return event.ch | event.key;
+	} else {
+		return 0;
+	}
+}
+
+static inline int process_hotkey(
+	const char key, const char *path, TimerRefMut timer,
+	HotkeySystemRefMut hotkey_system)
 {
 	if (key == CONFIG.local_hk.hks_enable)
 		HotkeySystem_activate(hotkey_system);
@@ -156,4 +180,12 @@ static void load_layout(command_t *cmd)
 	}
 
 	close(fd);
+}
+
+static void load_config(command_t *cmd)
+{
+	if (ini_parse(cmd->arg, config_ini_handler, NULL) < 0) {
+		puts("Error parsing config file\n");
+		exit(1);
+	}
 }
