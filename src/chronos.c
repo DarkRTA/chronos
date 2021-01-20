@@ -92,7 +92,8 @@ int main(int argc, char *argv[])
 
 	SharedTimer_drop(stimer);
 	Layout_drop(layout);
-	HotkeySystem_drop(hotkey_system);
+	if (hotkey_system != NULL)
+		HotkeySystem_drop(hotkey_system);
 	command_free(&cmd);
 }
 
@@ -111,9 +112,11 @@ static inline int process_hotkey(
 	HotkeySystemRefMut hotkey_system)
 {
 	if (key == CONFIG.local_hk.hks_enable)
-		HotkeySystem_activate(hotkey_system);
+		if (hotkey_system != NULL)
+			HotkeySystem_activate(hotkey_system);
 	if (key == CONFIG.local_hk.hks_disable)
-		HotkeySystem_deactivate(hotkey_system);
+		if (hotkey_system != NULL)
+			HotkeySystem_deactivate(hotkey_system);
 	if (key == CONFIG.local_hk.split)
 		Timer_split_or_start(timer);
 	if (key == CONFIG.local_hk.reset)
