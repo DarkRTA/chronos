@@ -18,8 +18,8 @@ void render_key_value(KeyValueComponentStateRef state, int *line)
 	char *key = strdup(KeyValueComponentState_key(state));
 	char *value = strdup(KeyValueComponentState_value(state));
 
-	int color = config_get_semantic_color(
-		KeyValueComponentState_semantic_color(state));
+	int color =
+		config_get_semantic_color(KeyValueComponentState_semantic_color(state));
 
 	int x = WIDTH - strlen(value);
 

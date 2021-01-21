@@ -40,11 +40,7 @@ void render(LayoutStateRef state)
 	size_t len = LayoutState_len(state);
 	int line = 0;
 	for (size_t i = 0; i < len; i++) {
-		render_component(
-			state,
-			i,
-			LayoutState_component_type(state, i),
-			&line);
+		render_component(state, i, LayoutState_component_type(state, i), &line);
 	}
 	tb_present();
 }

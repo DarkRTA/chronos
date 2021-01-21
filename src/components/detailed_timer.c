@@ -29,15 +29,14 @@ draw_line(const char *label, int *line, int color, char *time, char *frac)
 void render_detailed_timer(DetailedTimerComponentStateRef state, int *line)
 {
 	char *time_time = strdup(DetailedTimerComponentState_timer_time(state));
-	char *time_frac =
-		strdup(DetailedTimerComponentState_timer_fraction(state));
+	char *time_frac = strdup(DetailedTimerComponentState_timer_fraction(state));
 	int time_color = config_get_semantic_color(
 		DetailedTimerComponentState_timer_semantic_color(state));
 
 	char *seg_time =
 		strdup(DetailedTimerComponentState_segment_timer_time(state));
-	char *seg_frac = strdup(
-		DetailedTimerComponentState_segment_timer_fraction(state));
+	char *seg_frac =
+		strdup(DetailedTimerComponentState_segment_timer_fraction(state));
 
 	draw_line("Time", line, time_color, time_time, time_frac);
 	draw_line("Segment", line, 0, seg_time, seg_frac);

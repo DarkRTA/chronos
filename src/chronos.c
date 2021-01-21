@@ -70,9 +70,8 @@ int main(int argc, char *argv[])
 	tb_init();
 	tb_select_output_mode(TB_OUTPUT_256);
 
-	hotkey_system = HotkeySystem_with_config(
-		SharedTimer_share(stimer),
-		CONFIG.global_hk);
+	hotkey_system =
+		HotkeySystem_with_config(SharedTimer_share(stimer), CONFIG.global_hk);
 
 	LayoutState state = LayoutState_new();
 	for (;;) {

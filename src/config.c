@@ -87,27 +87,27 @@ void config_init()
 }
 
 #define LOCAL_HK(k)                                                            \
-	do {                                                                   \
-		if (!strcmp(section, "local_hotkeys") && !strcmp(name, #k)) {  \
-			CONFIG.local_hk.k = value[0];                          \
-		}                                                              \
+	do {                                                                       \
+		if (!strcmp(section, "local_hotkeys") && !strcmp(name, #k)) {          \
+			CONFIG.local_hk.k = value[0];                                      \
+		}                                                                      \
 	} while (0)
 
 #define GLOBAL_HK(i, k)                                                        \
-	do {                                                                   \
-		if (!strcmp(section, "global_hotkeys") && !strcmp(name, #k)) { \
-			HotkeyConfig_set_value(                                \
-				CONFIG.global_hk,                              \
-				i,                                             \
-				SettingValue_from_string(value));              \
-		}                                                              \
+	do {                                                                       \
+		if (!strcmp(section, "global_hotkeys") && !strcmp(name, #k)) {         \
+			HotkeyConfig_set_value(                                            \
+				CONFIG.global_hk,                                              \
+				i,                                                             \
+				SettingValue_from_string(value));                              \
+		}                                                                      \
 	} while (0)
 
 #define COLOR(k)                                                               \
-	do {                                                                   \
-		if (!strcmp(section, "colors") && !strcmp(name, #k)) {         \
-			CONFIG.color.k = atoi(value);                          \
-		}                                                              \
+	do {                                                                       \
+		if (!strcmp(section, "colors") && !strcmp(name, #k)) {                 \
+			CONFIG.color.k = atoi(value);                                      \
+		}                                                                      \
 	} while (0)
 
 int config_ini_handler(
