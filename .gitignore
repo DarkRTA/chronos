@@ -1,4 +1,6 @@
 *.o
+.cache
+compile_commands.json
 obj
 *.swp
 tags

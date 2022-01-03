@@ -1,5 +1,5 @@
-CC      := cc -flto
-CFLAGS  := -Isrc -Ideps -Ilivesplit-core -I. -Wall -MMD -g -O2
+CC      := clang -flto
+CFLAGS  := -iquote . -iquote src -Ideps -Ilivesplit-core -Wall -MMD -g -O2
 LDFLAGS := -Llivesplit-core \
 		  -llivesplit_core \
 		  -lm \

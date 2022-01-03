@@ -26,4 +26,10 @@ You will need the following dependencies:
 * latest stable `rustc`
 * any c compiler with c99 support.
 
-Get the submodules, edit the Makefile, then run `make`
+Run the following commands in your shell.
+
+```
+git clone --recursive https://github.com/darkrta/chronos
+cd chronos
+make
+```
