@@ -1,4 +1,4 @@
-CC      := clang -flto
+CC      := clang -flto -D_GNU_SOURCE
 CFLAGS  := -iquote . -iquote src -Ideps -Ilivesplit-core -Wall -MMD -g -O2
 LDFLAGS := -Llivesplit-core \
 		  -llivesplit_core \
@@ -48,7 +48,7 @@ livesplit-core/liblivesplit_core.a:
 	@cd livesplit-core/livesplit-core; \
 	git reset --hard; \
 	git apply --3way ../livesplit_core.patch; \
-	cargo build --release -p staticlib; \
+	cargo build --release -p staticlib --features auto-splitting; \
 	cp target/release/liblivesplit_core.a ../liblivesplit_core.a; \
 
 livesplit-core/livesplit_core.h:

@@ -1,4 +1,3 @@
-#define _GNU_SOURCE
 #include "components/components.h"
 
 #include <stdlib.h>

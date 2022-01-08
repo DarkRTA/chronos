@@ -1,4 +1,3 @@
-#define _GNU_SOURCE
 #include "tb_extras.h"
 
 #include <stdarg.h>

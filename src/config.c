@@ -33,47 +33,47 @@ void config_init()
 	HotkeyConfig_set_value(
 		CONFIG.global_hk,
 		0,
-		SettingValue_from_string("NumPad0"));
+		SettingValue_from_string("Numpad0"));
 	//Reset
 	HotkeyConfig_set_value(
 		CONFIG.global_hk,
 		1,
-		SettingValue_from_string("NumPad1"));
+		SettingValue_from_string("Numpad1"));
 	//Undo
 	HotkeyConfig_set_value(
 		CONFIG.global_hk,
 		2,
-		SettingValue_from_string("NumPad8"));
+		SettingValue_from_string("Numpad8"));
 	//Skip
 	HotkeyConfig_set_value(
 		CONFIG.global_hk,
 		3,
-		SettingValue_from_string("NumPad2"));
+		SettingValue_from_string("Numpad2"));
 	//Pause
 	HotkeyConfig_set_value(
 		CONFIG.global_hk,
 		4,
-		SettingValue_from_string("NumPad5"));
+		SettingValue_from_string("Numpad5"));
 	//Undo All Pauses
 	HotkeyConfig_set_value(
 		CONFIG.global_hk,
 		5,
-		SettingValue_from_string("NumPad2"));
+		SettingValue_from_string("Numpad2"));
 	//Previous Comparison
 	HotkeyConfig_set_value(
 		CONFIG.global_hk,
 		6,
-		SettingValue_from_string("NumPad4"));
+		SettingValue_from_string("Numpad4"));
 	//Next Comparison
 	HotkeyConfig_set_value(
 		CONFIG.global_hk,
 		7,
-		SettingValue_from_string("NumPad6"));
+		SettingValue_from_string("Numpad6"));
 	//Toggle timing method
 	HotkeyConfig_set_value(
 		CONFIG.global_hk,
 		8,
-		SettingValue_from_string("NumPad9"));
+		SettingValue_from_string("Numpad9"));
 
 	CONFIG.color.default_color = 0;
 	CONFIG.color.ahead_gaining_time = 41;
