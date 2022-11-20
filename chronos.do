@@ -1,4 +1,7 @@
 . ./cflags.rc
+
+# XXX: this will break if there are spaces in the filename
+# perhaps we should use a compiler wrapper script and set IFS
 OBJ=$(
 	find src deps -type f -name '*.c' \
 		| sed \
@@ -8,6 +11,9 @@ OBJ=$(
 
 redo-ifchange livesplit-core/liblivesplit_core.a
 redo-ifchange livesplit-core/livesplit_core.h
+
+# shellcheck disable=SC2086
 redo-ifchange $OBJ
 
-$CC -o $3 $OBJ $LDFLAGS
+# shellcheck disable=SC2086
+$CC -o "$3" $OBJ $LDFLAGS
