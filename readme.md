@@ -22,7 +22,6 @@ really easy to modify for your needs.
 
 You will need the following dependencies:
 
-* `make`
 * latest stable `rustc`
 * any c compiler with c99 support.
 
@@ -31,5 +30,5 @@ Run the following commands in your shell.
 ```
 git clone --recursive https://github.com/darkrta/chronos
 cd chronos
-make
+./do
 ```

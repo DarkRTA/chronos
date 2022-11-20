@@ -1,0 +1,7 @@
+CC="clang -flto -D_GNU_SOURCE"
+CFLAGS="-iquote . -iquote src -Ideps -Ilivesplit-core -Wall -MMD -g -O2 -DINI_ALLOW_NO_VALUE=1"
+LDFLAGS="-Llivesplit-core
+		  -llivesplit_core
+		  -lm
+		  -lpthread
+		  -ldl"
