@@ -1,4 +1,4 @@
-source ./cflags.rc
+. ./cflags.rc
 OBJ=$(
 	find src deps -type f -name '*.c' \
 		| sed \
