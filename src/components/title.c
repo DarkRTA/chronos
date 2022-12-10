@@ -21,22 +21,20 @@ void render_title(TitleComponentStateRef state, int *line)
 	int attempts = TitleComponentState_attempts(state);
 	int finished = TitleComponentState_finished_runs(state);
 
-	char *attstr = NULL;
+	char attempts_string[50] = { 0 };
+
 	if (TitleComponentState_shows_attempts(state)) {
 		if (TitleComponentState_shows_finished_runs(state))
-			asprintf(&attstr, "%d / %d", finished, attempts);
+			snprintf(attempts_string, 50, "%d / %d", finished, attempts);
 		else
-			asprintf(&attstr, "%d", attempts);
-	} else {
-		attstr = calloc(1, 1); //single null byte
+			snprintf(attempts_string, 50, "%d", attempts);
 	}
 
-	int x = WIDTH - strlen(attstr);
+	int x = WIDTH - strlen(attempts_string);
 	tb_put_string(x - 2, *line, "  ", 0, 0);
-	tb_put_string(x, *line, attstr, 0, 0);
+	tb_put_string(x, *line, attempts_string, 0, 0);
 	*line += 1;
 
-	free(attstr);
 	free(line2);
 	free(line1);
 }
