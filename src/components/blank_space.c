@@ -7,7 +7,7 @@
 
 #include "chronos.h"
 
-void render_blank_space(BlankSpaceComponentStateRef state, int *line)
+void render_blank_space(UNUSED BlankSpaceComponentStateRef state, int *line)
 {
 	*line += 1;
 }

@@ -8,7 +8,7 @@
 
 #include "chronos.h"
 
-void render_separator(SeparatorComponentStateRef state, int *line)
+void render_separator(UNUSED SeparatorComponentStateRef state, int *line)
 {
 	for (int i = 0; i < WIDTH; i++) {
 		tb_change_cell(i, *line, '-', 0, 0);

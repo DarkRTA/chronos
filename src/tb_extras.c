@@ -12,7 +12,7 @@ void tb_put_string(int x, int y, const char *str, uint16_t fg, uint16_t bg)
 {
 	size_t len = strlen(str);
 
-	for (int i = 0; i < len; i++) {
+	for (size_t i = 0; i < len; i++) {
 		tb_change_cell(x + i, y, str[i], fg, bg);
 	}
 }

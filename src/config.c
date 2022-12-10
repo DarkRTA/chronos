@@ -111,7 +111,7 @@ void config_init()
 	} while (0)
 
 int config_ini_handler(
-	void *d, const char *section, const char *name, const char *value)
+	UNUSED void *d, const char *section, const char *name, const char *value)
 {
 	//empty values should be treated as a single space
 	if (!strcmp("", value)) {

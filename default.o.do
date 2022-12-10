@@ -1,3 +1,4 @@
+redo-ifchange cflags.rc
 . ./cflags.rc
 mkdir -p "$(dirname "$1")"
 file="${2#obj/}.c"
