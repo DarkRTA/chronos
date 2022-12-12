@@ -229,11 +229,8 @@ fn render_splits(
         for (j, column) in split.columns.iter().enumerate() {
             x_pos = x_pos.saturating_sub(column_widths[j] + 1);
             let fg_color = column.visual_color;
-            let text = format!(
-                "{: >w$}",
-                column.value,
-                w = (column_widths[j] + 1)
-            );
+            let text =
+                format!("{: >w$}", column.value, w = (column_widths[j] + 1));
 
             term.puts(x_pos, *current_line, fg_color, bg_color, &text);
         }

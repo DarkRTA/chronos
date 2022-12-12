@@ -72,8 +72,7 @@ impl Terminal {
 
             self.on_screen = Vec::new();
             self.to_draw = Vec::new();
-            self.to_draw
-                .resize(width * height, TerminalCell::default());
+            self.to_draw.resize(width * height, TerminalCell::default());
         }
     }
 
