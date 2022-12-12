@@ -1,4 +1,3 @@
-use crossterm::cursor;
 use crossterm::cursor::MoveTo;
 use crossterm::queue;
 use crossterm::style::Color as CrosstermColor;
@@ -6,9 +5,6 @@ use crossterm::style::Print;
 use crossterm::style::SetBackgroundColor;
 use crossterm::style::SetForegroundColor;
 use crossterm::terminal::Clear;
-use crossterm::terminal::EnterAlternateScreen;
-use crossterm::terminal::LeaveAlternateScreen;
-use crossterm::ExecutableCommand;
 use livesplit_core::settings::Color;
 use std::io::stdout;
 use std::io::Stdout;
@@ -40,20 +36,9 @@ pub struct Terminal {
     output: Stdout,
 }
 
-impl Drop for Terminal {
-    fn drop(&mut self) {
-        self.output.execute(LeaveAlternateScreen).unwrap();
-        self.output.execute(cursor::Show).unwrap();
-        crossterm::terminal::disable_raw_mode().unwrap();
-    }
-}
-
 impl Terminal {
     pub fn new() -> Self {
-        let mut output = stdout();
-        crossterm::terminal::enable_raw_mode().unwrap();
-        output.execute(EnterAlternateScreen).unwrap();
-        output.execute(cursor::Hide).unwrap();
+        let output = stdout();
         Terminal {
             on_screen: Vec::new(),
             to_draw: Vec::new(),
@@ -170,6 +155,10 @@ impl Terminal {
         self.output.flush().unwrap();
         self.on_screen = self.to_draw.clone();
         self.should_redraw = false;
+    }
+
+    pub fn force_redraw(&mut self) {
+        self.should_redraw = true;
     }
 }
 fn convert_color(color: &Color) -> CrosstermColor {

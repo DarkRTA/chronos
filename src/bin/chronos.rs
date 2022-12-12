@@ -3,12 +3,17 @@ use std::fs;
 use std::fs::File;
 use std::io::BufWriter;
 use std::io::Cursor;
+use std::io::stdout;
 use std::time::Duration;
 
 use clap::Parser;
 use crossterm::event;
 use crossterm::event::Event;
 use crossterm::event::KeyCode;
+use crossterm::terminal::EnterAlternateScreen;
+use crossterm::terminal::LeaveAlternateScreen;
+use crossterm::cursor;
+use crossterm::ExecutableCommand;
 use livesplit_core::auto_splitting;
 use livesplit_core::layout::LayoutSettings;
 use livesplit_core::run::parser;
@@ -16,6 +21,8 @@ use livesplit_core::run::saver::livesplit;
 use livesplit_core::HotkeySystem;
 use livesplit_core::Layout;
 use livesplit_core::Timer;
+
+use std::panic;
 
 use chronos::terminal;
 use chronos::Config;
@@ -38,7 +45,20 @@ struct Args {
     splits: String,
 }
 
+fn register_panic_handler() {
+    let default_hook = panic::take_hook();
+
+    panic::set_hook(Box::new(move |info| {
+        drop(stdout().execute(LeaveAlternateScreen));
+        drop(stdout().execute(cursor::Show));
+        drop(crossterm::terminal::disable_raw_mode());
+        default_hook(info);
+    }));
+}
+
 fn main() -> Result<(), Box<dyn Error>> {
+    register_panic_handler();
+
     let args = Args::parse();
     let splits_file = fs::read(&args.splits)?;
     let run = parser::composite::parse(
@@ -95,6 +115,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     };
 
     let mut term = terminal::Terminal::new();
+    let mut stdout = stdout();
+    crossterm::terminal::enable_raw_mode().unwrap();
+    stdout.execute(EnterAlternateScreen).unwrap();
+    stdout.execute(cursor::Hide).unwrap();
+
     loop {
         let timer = stimer.read().unwrap();
         let state = layout.state(&timer.snapshot());
@@ -117,12 +142,17 @@ fn main() -> Result<(), Box<dyn Error>> {
                         }
                     }
                     KeyCode::F(3) => {
+                        stdout.execute(LeaveAlternateScreen).unwrap();
                         let file = File::create(&args.splits)?;
                         let writer = BufWriter::new(file);
                         livesplit::save_run(
                             timer.snapshot().run(),
                             livesplit::IoWrite(writer),
                         )?;
+                        println!("splits saved successfully...\r");
+                        drop(event::read()?);
+                        term.force_redraw();
+                        stdout.execute(EnterAlternateScreen).unwrap();
                     }
                     KeyCode::Char(chr) => {
                         config.local_hotkeys.do_key(chr, &mut timer);
@@ -132,6 +162,10 @@ fn main() -> Result<(), Box<dyn Error>> {
             }
         }
     }
+
+    stdout.execute(LeaveAlternateScreen).unwrap();
+    stdout.execute(cursor::Show).unwrap();
+    crossterm::terminal::disable_raw_mode().unwrap();
 
     Ok(())
 }
