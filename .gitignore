@@ -1,17 +1,1 @@
-*.o
-.cache
-compile_commands.json
-obj
-*.swp
-tags
-chronos
-livesplit-core/livesplit_core.h
-livesplit-core/liblivesplit_core.a
-
-
-# redo
-*.did
-.dep.*
-.do_built*
-.redo
-*.tmp
+/target

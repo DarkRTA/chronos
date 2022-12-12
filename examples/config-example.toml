@@ -1,0 +1,21 @@
+[local_hotkeys]
+split_or_start = " "
+reset_nosave = "X"
+reset = "x"
+undo_split = "c"
+skip_split = "v"
+toggle_pause = "b"
+undo_all_pauses = "n"
+previous_comparison = ","
+next_comparison = "."
+
+[global_hotkeys]
+split = "Numpad1"
+reset = "Numpad3"
+undo = "Numpad8"
+skip = "Numpad2"
+pause = "Numpad5"
+undo_all_pauses = "Numpad7"
+previous_comparison = "Numpad4"
+next_comparison = "Numpad6"
+toggle_timing_method = "Numpad9"

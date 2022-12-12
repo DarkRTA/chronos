@@ -44,7 +44,7 @@
                 "background": {
                     "Same": "Transparent"
                 },
-                "visual_split_count": 17,
+                "visual_split_count": 16,
                 "split_preview_count": 1,
                 "show_thin_separators": false,
                 "separator_last_split": false,
@@ -86,39 +86,6 @@
         },
         "Separator",
         {
-            "PbChance": {
-                "background": {
-                    "Plain": [
-                        0.09803922,
-                        0.11764706,
-                        0.13725491,
-                        1
-                    ]
-                },
-                "display_two_rows": false,
-                "label_color": null,
-                "value_color": null
-            }
-        },
-        {
-            "PossibleTimeSave": {
-                "background": {
-                    "Plain": [
-                        0.09803922,
-                        0.11764706,
-                        0.13725491,
-                        1
-                    ]
-                },
-                "comparison_override": null,
-                "display_two_rows": false,
-                "total_possible_time_save": false,
-                "label_color": null,
-                "value_color": null,
-                "accuracy": "Hundredths"
-            }
-        },
-        {
             "PreviousSegment": {
                 "background": {
                     "Plain": [
@@ -137,7 +104,7 @@
             }
         },
         {
-            "PossibleTimeSave": {
+            "SumOfBest": {
                 "background": {
                     "Plain": [
                         0.09803922,
@@ -146,12 +113,10 @@
                         1
                     ]
                 },
-                "comparison_override": null,
                 "display_two_rows": false,
-                "total_possible_time_save": true,
                 "label_color": null,
                 "value_color": null,
-                "accuracy": "Hundredths"
+                "accuracy": "Seconds"
             }
         },
         "Separator",

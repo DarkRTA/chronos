@@ -1,34 +1,34 @@
-# chronos - a command line speedrun timer
+# chronos
 
-`chronos` is a lightweight and fast speedrun timer using livesplit-core
-that runs in your terminal. With only about 900 lines of C, it is also 
-really easy to modify for your needs.
-
-### Usage
-
-```
-  Usage: ./chronos [options]
-
-  Options:
-
-    -V, --version                 output program version
-    -h, --help                    output help information
-    -c, --config <arg>            config file to use
-    -l, --layout <arg>            layout file to use
-    -s, --splits <arg>            split file to use
-```
+`chronos` is a lightweight speedrun timer that runs in your terminal.
 
 ## Building
 
 You will need the following dependencies:
 
-* latest stable `rustc`
-* any c compiler with c99 support.
+* latest stable rust
 
 Run the following commands in your shell.
 
 ```
 git clone --recursive https://github.com/darkrta/chronos
 cd chronos
-./do
+cargo build --release
 ```
+
+The timer should be placed in `./target/`
+
+## Usage
+
+* See `./chronos --help` for command line args.
+* Split files can be imported from both LiveSplit and Livepslit One.
+* Layout files can only be used from LiveSplit One, and may require tweaking in
+  order to look right. A best effort attempt is made to use colors from the
+  layout as they are.
+
+### Key Bindings
+* Escape - Quit
+* F1 - Activate Global Hotkeys
+* F2 - Deactivate Global Hotkeys
+* F3 - Save Splits (not done automatically)
+* More key binds are in `./examples/config-example.toml`

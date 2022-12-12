@@ -1,7 +1,0 @@
-CC="clang -D_GNU_SOURCE  -fdiagnostics-color=always"
-CFLAGS="-iquote . -iquote src -Ideps -Ilivesplit-core -Wall -W -MMD -g -O2 -DINI_ALLOW_NO_VALUE=1 -std=c17"
-LDFLAGS="-Llivesplit-core
-		  -llivesplit_core
-		  -lm
-		  -lpthread
-		  -ldl"

@@ -1,1 +1,1 @@
-redo-ifchange chronos
+cargo build --release --color always
