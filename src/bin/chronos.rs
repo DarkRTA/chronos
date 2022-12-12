@@ -13,15 +13,14 @@ use livesplit_core::auto_splitting;
 use livesplit_core::layout::LayoutSettings;
 use livesplit_core::run::parser;
 use livesplit_core::run::saver::livesplit;
-use livesplit_core::HotkeyConfig;
 use livesplit_core::HotkeySystem;
 use livesplit_core::Layout;
 use livesplit_core::Timer;
-use serde::Deserialize;
-use serde::Serialize;
 
-mod renderer;
-mod terminal;
+use chronos::terminal;
+use chronos::Config;
+use chronos::renderer;
+
 
 #[derive(Parser, Debug)]
 struct Args {
@@ -37,74 +36,6 @@ struct Args {
     #[arg(short, long)]
     /// splits file to use
     splits: String,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct LocalHotkeys {
-    split_or_start: char,
-    reset_nosave: char,
-    reset: char,
-    undo_split: char,
-    skip_split: char,
-    toggle_pause: char,
-    undo_all_pauses: char,
-    previous_comparison: char,
-    next_comparison: char,
-}
-
-impl Default for LocalHotkeys {
-    fn default() -> Self {
-        LocalHotkeys {
-            split_or_start: ' ',
-            reset_nosave: 'X',
-            reset: 'x',
-            undo_split: 'c',
-            skip_split: 'v',
-            toggle_pause: 'b',
-            undo_all_pauses: 'n',
-            previous_comparison: ',',
-            next_comparison: '.',
-        }
-    }
-}
-
-impl LocalHotkeys {
-    pub fn do_key(&self, chr: char, timer: &mut Timer) {
-        // why....
-        if chr == self.split_or_start {
-            timer.split_or_start();
-        }
-        if chr == self.reset_nosave {
-            timer.reset(false);
-        }
-        if chr == self.reset {
-            timer.reset(true);
-        }
-        if chr == self.undo_split {
-            timer.undo_split();
-        }
-        if chr == self.skip_split {
-            timer.skip_split();
-        }
-        if chr == self.toggle_pause {
-            timer.toggle_pause();
-        }
-        if chr == self.undo_all_pauses {
-            timer.undo_all_pauses();
-        }
-        if chr == self.previous_comparison {
-            timer.switch_to_previous_comparison();
-        }
-        if chr == self.next_comparison {
-            timer.switch_to_next_comparison();
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize, Default)]
-struct Config {
-    local_hotkeys: LocalHotkeys,
-    global_hotkeys: HotkeyConfig,
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -124,7 +55,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             Layout::from_settings(settings)
         }
         None => {
-            let layout = include_bytes!("default_layout.ls1l");
+            let layout = chronos::DEFAULT_LAYOUT;
             let cursor = Cursor::new(layout);
             let settings = LayoutSettings::from_json(cursor)?;
             Layout::from_settings(settings)
