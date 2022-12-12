@@ -9,14 +9,14 @@ use clap::Parser;
 use crossterm::event;
 use crossterm::event::Event;
 use crossterm::event::KeyCode;
+use livesplit_core::auto_splitting;
 use livesplit_core::layout::LayoutSettings;
 use livesplit_core::run::parser;
+use livesplit_core::run::saver::livesplit;
 use livesplit_core::HotkeyConfig;
 use livesplit_core::HotkeySystem;
 use livesplit_core::Layout;
 use livesplit_core::Timer;
-use livesplit_core::auto_splitting;
-use livesplit_core::run::saver::livesplit;
 use serde::Deserialize;
 use serde::Serialize;
 
@@ -110,9 +110,12 @@ struct Config {
 fn main() -> Result<(), Box<dyn Error>> {
     let args = Args::parse();
     let splits_file = fs::read(&args.splits)?;
-    let run =
-        parser::composite::parse(&splits_file, Some((&args.splits).into()), true)?
-            .run;
+    let run = parser::composite::parse(
+        &splits_file,
+        Some((&args.splits).into()),
+        true,
+    )?
+    .run;
     let stimer = Timer::new(run)?.into_shared();
 
     let mut layout = match args.layout {
@@ -130,7 +133,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let config = match &args.config {
         Some(path) => toml::de::from_slice(&fs::read(path)?)?,
-        None => Config::default()
+        None => Config::default(),
     };
 
     // we actually do nothing with this but will need to hold onto it as the
@@ -140,11 +143,26 @@ fn main() -> Result<(), Box<dyn Error>> {
             let runtime = auto_splitting::Runtime::new(stimer.clone());
             runtime.load_script_blocking(path.into())?;
             Some(runtime)
-        },
+        }
         None => None,
     };
 
-    let mut hotkey_system = HotkeySystem::with_config(stimer.clone(), config.global_hotkeys)?;
+    let mut hotkey_system = match HotkeySystem::with_config(
+        stimer.clone(),
+        config.global_hotkeys,
+    ) {
+        Ok(hks) => Some(hks),
+        Err(err) => {
+            println!("error intitializing the hotkey system: {err}");
+            println!("global hotkeys will be unavailable");
+            println!("press any key to continue...");
+            crossterm::terminal::enable_raw_mode()?;
+            drop(event::read());
+            crossterm::terminal::disable_raw_mode()?;
+            None
+        }
+    };
+
     let mut term = terminal::Terminal::new();
     loop {
         let timer = stimer.read().unwrap();
@@ -157,13 +175,24 @@ fn main() -> Result<(), Box<dyn Error>> {
                 let mut timer = stimer.write().unwrap();
                 match k.code {
                     KeyCode::Esc => break,
-                    KeyCode::F(1) => hotkey_system.activate()?,
-                    KeyCode::F(2) => hotkey_system.deactivate()?,
+                    KeyCode::F(1) => {
+                        if let Some(ref mut hks) = hotkey_system {
+                            hks.activate()?;
+                        }
+                    }
+                    KeyCode::F(2) => {
+                        if let Some(ref mut hks) = hotkey_system {
+                            hks.deactivate()?;
+                        }
+                    }
                     KeyCode::F(3) => {
                         let file = File::create(&args.splits)?;
                         let writer = BufWriter::new(file);
-                        livesplit::save_run(timer.snapshot().run(), livesplit::IoWrite(writer))?;
-                    },
+                        livesplit::save_run(
+                            timer.snapshot().run(),
+                            livesplit::IoWrite(writer),
+                        )?;
+                    }
                     KeyCode::Char(chr) => {
                         config.local_hotkeys.do_key(chr, &mut timer);
                     }
