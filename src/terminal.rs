@@ -85,7 +85,7 @@ impl Terminal {
         string: &str,
     ) {
         for (i, chr) in string.chars().enumerate() {
-            if i + x > self.width {
+            if i + x >= self.width {
                 break;
             }
 
