@@ -24,9 +24,12 @@ use livesplit_core::Timer;
 
 use std::panic;
 
-use chronos::terminal;
 use chronos::Config;
-use chronos::renderer;
+
+pub mod terminal;
+pub mod renderer;
+
+pub const DEFAULT_LAYOUT: &[u8; 6413] = include_bytes!("default_layout.ls1l");
 
 
 #[derive(Parser, Debug)]
@@ -75,7 +78,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             Layout::from_settings(settings)
         }
         None => {
-            let layout = chronos::DEFAULT_LAYOUT;
+            let layout = DEFAULT_LAYOUT;
             let cursor = Cursor::new(layout);
             let settings = LayoutSettings::from_json(cursor)?;
             Layout::from_settings(settings)

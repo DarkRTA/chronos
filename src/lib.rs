@@ -3,10 +3,6 @@ use livesplit_core::Timer;
 use serde::Deserialize;
 use serde::Serialize;
 
-pub mod terminal;
-pub mod renderer;
-
-pub const DEFAULT_LAYOUT: &[u8; 6413] = include_bytes!("default_layout.ls1l");
 
 #[derive(Serialize, Deserialize)]
 pub struct LocalHotkeys {
