@@ -1,18 +1,18 @@
 use std::error::Error;
 use std::fs;
 use std::fs::File;
+use std::io::stdout;
 use std::io::BufWriter;
 use std::io::Cursor;
-use std::io::stdout;
 use std::time::Duration;
 
 use clap::Parser;
+use crossterm::cursor;
 use crossterm::event;
 use crossterm::event::Event;
 use crossterm::event::KeyCode;
 use crossterm::terminal::EnterAlternateScreen;
 use crossterm::terminal::LeaveAlternateScreen;
-use crossterm::cursor;
 use crossterm::ExecutableCommand;
 use livesplit_core::auto_splitting;
 use livesplit_core::layout::LayoutSettings;
@@ -26,11 +26,10 @@ use std::panic;
 
 use chronos::Config;
 
-pub mod terminal;
 pub mod renderer;
+pub mod terminal;
 
 pub const DEFAULT_LAYOUT: &[u8; 6413] = include_bytes!("default_layout.ls1l");
-
 
 #[derive(Parser, Debug)]
 struct Args {
