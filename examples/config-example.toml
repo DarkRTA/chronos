@@ -8,6 +8,7 @@ toggle_pause = "b"
 undo_all_pauses = "n"
 previous_comparison = ","
 next_comparison = "."
+toggle_timing_method = "/"
 
 [global_hotkeys]
 split = "Numpad1"

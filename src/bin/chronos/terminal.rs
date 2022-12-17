@@ -161,6 +161,13 @@ impl Terminal {
         self.should_redraw = true;
     }
 }
+
+impl Default for Terminal {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 fn convert_color(color: &Color) -> CrosstermColor {
     let bytes = color.to_rgba8();
 

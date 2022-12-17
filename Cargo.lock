@@ -174,11 +174,13 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "chronos"
-version = "0.1.0"
+version = "0.3.0"
 dependencies = [
  "clap",
  "crossterm",
  "cursive",
+ "cursive_buffered_backend",
+ "libc",
  "livesplit-core",
  "serde",
  "toml",
@@ -445,6 +447,20 @@ dependencies = [
  "maplit",
  "signal-hook",
  "term_size",
+ "unicode-segmentation",
+ "unicode-width",
+]
+
+[[package]]
+name = "cursive_buffered_backend"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e902dfdc09ca6729606f45a5ce6ce4ef9637fc257e8b11ca7806fc9aabd03cf7"
+dependencies = [
+ "cursive_core",
+ "enumset",
+ "log",
+ "smallvec",
  "unicode-segmentation",
  "unicode-width",
 ]

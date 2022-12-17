@@ -1,6 +1,6 @@
 use std::error::Error;
-use std::fs;
 use std::fs::File;
+use std::fs::{self};
 use std::io::stdout;
 use std::io::BufWriter;
 use std::io::Cursor;
@@ -8,9 +8,9 @@ use std::time::Duration;
 
 use clap::Parser;
 use crossterm::cursor;
-use crossterm::event;
 use crossterm::event::Event;
 use crossterm::event::KeyCode;
+use crossterm::event::{self};
 use crossterm::terminal::EnterAlternateScreen;
 use crossterm::terminal::LeaveAlternateScreen;
 use crossterm::ExecutableCommand;
@@ -28,8 +28,6 @@ use chronos::Config;
 
 pub mod renderer;
 pub mod terminal;
-
-pub const DEFAULT_LAYOUT: &[u8; 6413] = include_bytes!("default_layout.ls1l");
 
 #[derive(Parser, Debug)]
 struct Args {
@@ -77,7 +75,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             Layout::from_settings(settings)
         }
         None => {
-            let layout = DEFAULT_LAYOUT;
+            let layout = chronos::DEFAULT_LAYOUT;
             let cursor = Cursor::new(layout);
             let settings = LayoutSettings::from_json(cursor)?;
             Layout::from_settings(settings)

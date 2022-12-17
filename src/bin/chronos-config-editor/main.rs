@@ -4,8 +4,9 @@ use chronos::UniqueID;
 use clap::Parser;
 use cursive::view::Nameable;
 use cursive::view::Scrollable;
+use cursive::views::Dialog;
 use cursive::views::EditView;
-use cursive::views::{Dialog, SelectView};
+use cursive::views::SelectView;
 use cursive::Cursive;
 use livesplit_core::hotkey::Hotkey;
 use livesplit_core::hotkey::KeyCode;
@@ -38,7 +39,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut siv = cursive::crossterm();
     siv.load_toml(chronos::CURSIVE_THEME).unwrap();
     let globals = GlobalState {
-        cfg: cfg,
+        cfg,
         filename: args.config_file,
     };
 
@@ -62,7 +63,7 @@ fn config_menu(s: &mut Cursive) -> Dialog {
 
     Dialog::around(setting_select)
         .title("chronos config editor")
-        .button("Save", |s| save_data(s))
+        .button("Save", save_data)
         .button("Quit", |s| s.quit())
 }
 
@@ -136,7 +137,6 @@ fn local_hotkey_editor(s: &mut Cursive, idx: usize, initial: char) {
         globals
             .cfg
             .set(idx, editor.get_content().chars().next().unwrap().into());
-        drop(globals);
         s.pop_layer();
         let mut list =
             s.find_name::<SelectView<usize>>("setting_list").unwrap();
