@@ -1,17 +1,25 @@
-use crate::global_state::GlobalState;
 use crate::error::show_error;
+use crate::global_state::GlobalState;
 
-use cursive::Cursive;
-use cursive::view::SizeConstraint::AtLeast;
-use cursive::views::{Dialog, SelectView, PaddedView, ListView, EditView}; 
-use cursive::traits::Resizable; 
-use livesplit_core::timing::formatter::{
-    none_wrapper::{NoneWrapper}, SegmentTime, TimeFormatter,
+use cursive::align::HAlign;
+use cursive::reexports::enumset::EnumSet;
+use cursive::theme::ColorStyle;
+use cursive::traits::Resizable;
+use cursive::view::SizeConstraint::{AtLeast, Fixed};
+use cursive::views::{
+    Dialog, EditView, LinearLayout, ListView, PaddedView, SelectView, TextView,
 };
+use cursive::Cursive;
 use livesplit_core::run::editor::{SegmentState, SelectionState};
+use livesplit_core::timing::formatter::{
+    none_wrapper::NoneWrapper, SegmentTime, TimeFormatter,
+};
 
-
-pub fn add_split(splits_list: &mut SelectView<usize>, s: &SegmentState, i: usize) {
+pub fn add_split(
+    splits_list: &mut SelectView<usize>,
+    s: &SegmentState,
+    i: usize,
+) {
     let name = format!("{:<37}", s.name);
     let mut split_time = format!("{:>11}", s.split_time);
     let mut segment_time = format!("{:>13}", s.segment_time);
@@ -100,43 +108,41 @@ pub fn edit_split_menu(s: &mut Cursive) {
         .format(active_segment.best_segment_time())
         .to_string();
 
-    let menu = PaddedView::lrtb(0, 0, 1, 0,
-        ListView::new()
-            .child(
-                "Name",
-                PaddedView::lrtb(0, 0, 0, 1,
-                    EditView::new().content(name).on_submit(save_split_name),
-                ),
-            )
-            .child(
-                "Split Time",
-                PaddedView::lrtb(0, 0, 0, 1,
-                    EditView::new()
-                        .content(split_time)
-                        .on_submit(save_split_time),
-                ),
-            )
-            .child(
-                "Segment Time",
-                PaddedView::lrtb(0, 0, 0, 1,
-                    EditView::new()
-                        .content(segment_time)
-                        .on_submit(save_segment_time),
-                ),
-            )
-            .child(
-                "Best Segment",
-                PaddedView::lrtb(0, 0, 0, 1,
-                    EditView::new()
-                        .content(best_segment_time)
-                        .on_submit(save_best_segment_time),
-                ),
-            )
-            .resized(AtLeast(40), AtLeast(10)),
-    );
+    let save_split_name_edit_view =
+        EditView::new().content(name).on_submit(save_split_name);
+    let save_split_time_edit_view = EditView::new()
+        .content(split_time)
+        .on_submit(save_split_time);
+    let save_segment_time_edit_view = EditView::new()
+        .content(segment_time)
+        .on_submit(save_segment_time);
+    let best_segment_time_edit_view = EditView::new()
+        .content(best_segment_time)
+        .on_submit(save_best_segment_time);
+
+    let save_details_list_view = ListView::new()
+        .child(
+            "Name",
+            PaddedView::lrtb(0, 0, 0, 1, save_split_name_edit_view),
+        )
+        .child(
+            "Split Time",
+            PaddedView::lrtb(0, 0, 0, 1, save_split_time_edit_view),
+        )
+        .child(
+            "Segment Time",
+            PaddedView::lrtb(0, 0, 0, 1, save_segment_time_edit_view),
+        )
+        .child(
+            "Best Segment",
+            PaddedView::lrtb(0, 0, 0, 1, best_segment_time_edit_view),
+        )
+        .resized(AtLeast(40), AtLeast(10));
+
+    let view = PaddedView::lrtb(0, 0, 1, 0, save_details_list_view);
 
     let dialog =
-        Dialog::around(menu)
+        Dialog::around(view)
             .title("edit split")
             .button("close", |s| {
                 s.pop_layer();
@@ -194,7 +200,6 @@ pub fn save_best_segment_time(s: &mut Cursive, value: &str) {
     refresh_splits(s)
 }
 
-
 pub fn refresh_splits(s: &mut Cursive) {
     let globals = s.user_data::<GlobalState>().unwrap();
     let state = globals.splits_editor.state();
@@ -219,3 +224,46 @@ pub fn refresh_splits(s: &mut Cursive) {
     splits_list.set_selection(selected_index as usize);
 }
 
+pub fn build_splits_title() -> ListView {
+    let split_name_text_view = TextView::new("Split Name")
+        .style(cursive::theme::Style {
+            effects: EnumSet::only(cursive::theme::Effect::Bold),
+            color: ColorStyle::default(),
+        })
+        .h_align(HAlign::Left)
+        .resized(Fixed(36), Fixed(1));
+
+    let split_time_text_view = TextView::new("Split Time")
+        .style(cursive::theme::Style {
+            effects: EnumSet::only(cursive::theme::Effect::Bold),
+            color: ColorStyle::default(),
+        })
+        .h_align(HAlign::Right)
+        .resized(Fixed(10), Fixed(1));
+
+    let segment_time_text_view = TextView::new("Segment Time")
+        .style(cursive::theme::Style {
+            effects: EnumSet::only(cursive::theme::Effect::Bold),
+            color: ColorStyle::default(),
+        })
+        .h_align(HAlign::Right)
+        .resized(Fixed(12), Fixed(1));
+
+    let best_segment_text_view = TextView::new("Best Segment")
+        .style(cursive::theme::Style {
+            effects: EnumSet::only(cursive::theme::Effect::Bold),
+            color: ColorStyle::default(),
+        })
+        .h_align(HAlign::Right)
+        .resized(Fixed(12), Fixed(1));
+
+    let splits_title_layout = LinearLayout::horizontal()
+        .child(split_name_text_view)
+        .child(PaddedView::lrtb(1, 0, 0, 0, split_time_text_view))
+        .child(PaddedView::lrtb(1, 0, 0, 0, segment_time_text_view))
+        .child(PaddedView::lrtb(1, 0, 0, 0, best_segment_text_view));
+
+    let wrapped_layout = PaddedView::lrtb(0, 0, 0, 1, splits_title_layout);
+
+    ListView::new().child("", wrapped_layout)
+}

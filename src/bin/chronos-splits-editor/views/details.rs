@@ -1,22 +1,17 @@
-use crate::global_state::GlobalState;
 use crate::error::show_error;
+use crate::global_state::GlobalState;
 
-use cursive::Cursive;
-use cursive::views::{
-    Button, 
-    Dialog, 
-    EditView, 
-    LinearLayout, 
-    ListView,
-    PaddedView, 
-    TextView, 
-};
-use cursive::view::SizeConstraint::{AtLeast, Full, Fixed};
-use cursive::traits::{Resizable, Nameable};
 use cursive::align::HAlign;
+use cursive::traits::{Nameable, Resizable};
+use cursive::view::SizeConstraint::{AtLeast, Fixed, Full};
+use cursive::views::{
+    Button, Dialog, EditView, LinearLayout, ListView, PaddedView, TextView,
+};
+use cursive::Cursive;
 
 use livesplit_core::timing::formatter::{
-    none_wrapper::{NoneWrapper, EmptyWrapper}, SegmentTime, TimeFormatter, Accuracy
+    none_wrapper::{EmptyWrapper, NoneWrapper},
+    Accuracy, SegmentTime, TimeFormatter,
 };
 
 pub fn edit_game_name_view(s: &mut Cursive) {
@@ -24,19 +19,17 @@ pub fn edit_game_name_view(s: &mut Cursive) {
 
     let name = globals.splits_editor.game_name();
 
-    let menu = PaddedView::lrtb(0, 0, 1, 0,
-        ListView::new()
-            .child(
-                "Name",
-                PaddedView::lrtb(0, 0, 0, 1,
-                    EditView::new().content(name).on_submit(save_game_name),
-                ),
-            )
-            .resized(AtLeast(40), AtLeast(10)),
-    );
+    let game_name_edit_view =
+        EditView::new().content(name).on_submit(save_game_name);
+
+    let game_name_list_view = ListView::new()
+        .child("", PaddedView::lrtb(0, 0, 0, 1, game_name_edit_view));
+
+    let view = PaddedView::lrtb(0, 0, 1, 0, game_name_list_view)
+        .resized(AtLeast(40), AtLeast(10));
 
     let dialog =
-        Dialog::around(menu)
+        Dialog::around(view)
             .title("edit game name")
             .button("close", |s| {
                 s.pop_layer();
@@ -65,20 +58,18 @@ pub fn edit_run_category_view(s: &mut Cursive) {
 
     let name = globals.splits_editor.category_name();
 
-    let menu = PaddedView::lrtb(0, 0, 1, 0,
-        ListView::new()
-            .child(
-                "Name",
-                PaddedView::lrtb(0, 0, 0, 1,
-                    EditView::new().content(name).on_submit(save_run_category),
-                ),
-            )
-            .resized(AtLeast(40), AtLeast(10)),
-    );
+    let run_category_edit_view =
+        EditView::new().content(name).on_submit(save_run_category);
+
+    let run_category_list_view = ListView::new()
+        .child("", PaddedView::lrtb(0, 0, 0, 1, run_category_edit_view));
+
+    let view = PaddedView::lrtb(0, 0, 1, 0, run_category_list_view)
+        .resized(AtLeast(40), AtLeast(10));
 
     let dialog =
-        Dialog::around(menu)
-            .title("edit game name")
+        Dialog::around(view)
+            .title("edit run category")
             .button("close", |s| {
                 s.pop_layer();
             });
@@ -107,21 +98,17 @@ pub fn edit_start_timer_at_view(s: &mut Cursive) {
     let formatter = NoneWrapper::new(SegmentTime::new(), "");
     let name = formatter.format(globals.splits_editor.offset()).to_string();
 
-    let menu = PaddedView::lrtb(0, 0, 1, 0,
-        ListView::new()
-            .child(
-                "Name",
-                PaddedView::lrtb(0, 0, 0, 1,
-                    EditView::new()
-                        .content(name)
-                        .on_submit(save_start_timer_at),
-                ),
-            )
-            .resized(AtLeast(40), AtLeast(10)),
-    );
+    let start_timer_at_edit_view =
+        EditView::new().content(name).on_submit(save_start_timer_at);
+
+    let start_timer_at_list_view = ListView::new()
+        .child("", PaddedView::lrtb(0, 0, 0, 1, start_timer_at_edit_view));
+
+    let view = PaddedView::lrtb(0, 0, 1, 0, start_timer_at_list_view)
+        .resized(AtLeast(40), AtLeast(10));
 
     let dialog =
-        Dialog::around(menu)
+        Dialog::around(view)
             .title("edit game name")
             .button("close", |s| {
                 s.pop_layer();
@@ -156,22 +143,19 @@ pub fn edit_attempts_view(s: &mut Cursive) {
 
     let name = globals.splits_editor.attempt_count();
 
-    let menu = PaddedView::lrtb(0, 0, 1, 0,
-        ListView::new()
-            .child(
-                "Name",
-                PaddedView::lrtb(0, 0, 0, 1,
-                    EditView::new()
-                        .content(name.to_string())
-                        .on_submit(save_attempts),
-                ),
-            )
-            .resized(AtLeast(40), AtLeast(10)),
-    );
+    let attempts_edit_view = EditView::new()
+        .content(name.to_string())
+        .on_submit(save_attempts);
+
+    let attempts_list_view = ListView::new()
+        .child("", PaddedView::lrtb(0, 0, 0, 1, attempts_edit_view));
+
+    let view = PaddedView::lrtb(0, 0, 1, 0, attempts_list_view)
+        .resized(AtLeast(40), AtLeast(10));
 
     let dialog =
-        Dialog::around(menu)
-            .title("edit game name")
+        Dialog::around(view)
+            .title("edit attempt count")
             .button("close", |s| {
                 s.pop_layer();
             });
@@ -206,57 +190,52 @@ pub fn update_details_view(s: &mut Cursive) -> ListView {
     let category = globals.splits_editor.category_name();
     let attempts = globals.splits_editor.attempt_count().to_string();
 
+    let game_name_layout = build_layout(
+        "Game Name:",
+        name,
+        "details_game_name_edit_view",
+        edit_game_name_view,
+    );
+
+    let run_category_layout = build_layout(
+        "Run Category:",
+        category,
+        "details_run_category_edit_view",
+        edit_run_category_view,
+    );
+
+    let start_timer_at_layout = build_layout(
+        "Start Timer At:",
+        &offset,
+        "details_start_timer_at_edit_view",
+        edit_start_timer_at_view,
+    );
+
+    let attempts_layout = build_layout(
+        "Attempts:",
+        &attempts.to_string(),
+        "details_attempts_edit_view",
+        edit_attempts_view,
+    );
+
     ListView::new()
-        .child(
-            "",
-            LinearLayout::horizontal()
-                .child(
-                    TextView::new("Game Name:")
-                        .h_align(HAlign::Left)
-                        .resized(Full, Fixed(1)),
-                )
-                .child(
-                    Button::new(name, |s| edit_game_name_view(s))
-                        .with_name("details_game_name_edit_view"),
-                ),
-        )
-        .child(
-            "",
-            LinearLayout::horizontal()
-                .child(
-                    TextView::new("Run Category:")
-                    .h_align(HAlign::Left)
-                    .resized(Full, Fixed(1)),
-                )
-                .child(
-                    Button::new(category, |s| edit_run_category_view(s))
-                        .with_name("details_run_category_edit_view"),
-                ),
-        )
-        .child(
-            "",
-            LinearLayout::horizontal()
-                .child(
-                    TextView::new("Start Timer At:")
-                    .h_align(HAlign::Left)
-                    .resized(Full, Fixed(1)),
-                )
-                .child(
-                    Button::new(offset, |s| edit_start_timer_at_view(s))
-                        .with_name("details_start_timer_at_edit_view"),
-                ),
-        )
-        .child(
-            "",
-            LinearLayout::horizontal()
-                .child(
-                    TextView::new("Attempts:")
-                        .h_align(HAlign::Left)
-                        .resized(Full, Fixed(1)),
-                )
-                .child(
-                    Button::new(attempts, |s| edit_attempts_view(s))
-                        .with_name("details_attempts_edit_view"),
-                ),
-        )
+        .child("", game_name_layout)
+        .child("", run_category_layout)
+        .child("", start_timer_at_layout)
+        .child("", attempts_layout)
+}
+
+fn build_layout(
+    label: &str,
+    value: &str,
+    name: &str,
+    f: fn(&mut Cursive),
+) -> LinearLayout {
+    let label = TextView::new(label)
+        .h_align(HAlign::Left)
+        .resized(Full, Fixed(1));
+
+    let button = Button::new(value, move |s| f(s)).with_name(name);
+
+    LinearLayout::horizontal().child(label).child(button)
 }

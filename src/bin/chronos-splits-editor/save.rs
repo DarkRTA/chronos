@@ -1,10 +1,8 @@
 use crate::global_state::GlobalState;
-use std::fs::File;
-use cursive::Cursive;
 use cursive::views::Dialog;
-use livesplit_core::run::{
-    saver::livesplit::{self, IoWrite},
-};
+use cursive::Cursive;
+use livesplit_core::run::saver::livesplit::{self, IoWrite};
+use std::fs::File;
 
 pub fn save_data(s: &mut Cursive) {
     let globals = s.user_data::<GlobalState>().unwrap();

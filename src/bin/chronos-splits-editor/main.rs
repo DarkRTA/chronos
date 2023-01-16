@@ -1,12 +1,12 @@
-mod views;
-mod global_state;
 mod error;
+mod global_state;
 mod parser;
 mod save;
+mod views;
 
-use views::layout;
 use global_state::GlobalState;
 use parser::{parse_args, parse_splits_file};
+use views::layout;
 
 use cursive::Cursive;
 use livesplit_core::run::Editor;
@@ -40,4 +40,3 @@ fn main() -> Result<(), Box<dyn Error>> {
     siv.run();
     Ok(())
 }
-
