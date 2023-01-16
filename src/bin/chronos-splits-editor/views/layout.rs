@@ -4,61 +4,16 @@ use crate::save;
 
 use crate::global_state::GlobalState;
 
-use cursive::Cursive;
 use cursive::direction::Orientation;
-use cursive::traits::{Resizable, Nameable};
-use cursive::align::HAlign;
-use cursive::theme::ColorStyle;
-use cursive::reexports::enumset::EnumSet;
-use cursive::view::SizeConstraint::{Full, Fixed};
-use cursive::views::{Panel, SelectView, PaddedView, ListView, LinearLayout, TextView, ScrollView, Dialog}; 
+use cursive::traits::{Nameable, Resizable};
+use cursive::view::SizeConstraint::{Fixed, Full};
+use cursive::views::{Dialog, LinearLayout, Panel, ScrollView, SelectView};
+use cursive::Cursive;
 
 pub fn render_layout(s: &mut Cursive) {
     let details = Panel::new(details::update_details_view(s))
         .title("details")
         .with_name("details_panel");
-
-    let splits_title = PaddedView::lrtb(0, 0, 0, 1,
-        LinearLayout::horizontal()
-            .child(
-                TextView::new("Split Name")
-                    .style(cursive::theme::Style {
-                        effects: EnumSet::only(cursive::theme::Effect::Bold),
-                        color: ColorStyle::default(),
-                    })
-                    .h_align(HAlign::Left)
-                    .resized(Fixed(36), Fixed(1)),
-            )
-            .child(PaddedView::lrtb(1, 0, 0, 0,
-                TextView::new("Split Time")
-                    .style(cursive::theme::Style {
-                        effects: EnumSet::only(cursive::theme::Effect::Bold),
-                        color: ColorStyle::default(),
-                    })
-                    .h_align(HAlign::Right)
-                    .resized(Fixed(10), Fixed(1)),
-            ))
-            .child(PaddedView::lrtb(1, 0, 0, 0,
-                TextView::new("Segment Time")
-                    .style(cursive::theme::Style {
-                        effects: EnumSet::only(cursive::theme::Effect::Bold),
-                        color: ColorStyle::default(),
-                    })
-                    .h_align(HAlign::Right)
-                    .resized(Fixed(12), Fixed(1)),
-            ))
-            .child(PaddedView::lrtb(1, 0, 0, 0,
-                TextView::new("Best Segment")
-                    .style(cursive::theme::Style {
-                        effects: EnumSet::only(cursive::theme::Effect::Bold),
-                        color: ColorStyle::default(),
-                    })
-                    .h_align(HAlign::Right)
-                    .resized(Fixed(12), Fixed(1)),
-            )),
-    );
-
-    let splits_title = ListView::new().child("", splits_title);
 
     let mut splits_list = SelectView::<usize>::new()
         .on_select(splits::on_splits_change)
@@ -75,7 +30,7 @@ pub fn render_layout(s: &mut Cursive) {
 
     let layout = LinearLayout::new(Orientation::Vertical)
         .child(details)
-        .child(splits_title)
+        .child(splits::build_splits_title())
         .child(ScrollView::new(splits_list));
 
     let main = Dialog::around(layout)
