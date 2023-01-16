@@ -8,6 +8,7 @@ use std::sync::atomic::AtomicU64;
 
 pub const CURSIVE_THEME: &str = include_str!("cursive-theme.toml");
 pub const DEFAULT_LAYOUT: &[u8; 6413] = include_bytes!("default_layout.ls1l");
+pub const DEFAULT_SPLITS: &[u8] = include_bytes!("default_splits.lss");
 
 #[derive(Serialize, Deserialize)]
 #[serde(default)]
