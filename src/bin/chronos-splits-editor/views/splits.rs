@@ -36,8 +36,8 @@ pub fn add_split(
     }
 
     let formatted = format!(
-        "{}{}{}{}",
-        name, split_time, segment_time, best_segment_time
+        "{}{}{}{}{}{}{}",
+        name, split_time, segment_time, best_segment_time, best_segment_time, best_segment_time, best_segment_time
     );
     splits_list.add_item(formatted, i);
 }
@@ -224,7 +224,7 @@ pub fn refresh_splits(s: &mut Cursive) {
     splits_list.set_selection(selected_index as usize);
 }
 
-pub fn build_splits_title() -> ListView {
+pub fn build_splits_title(s: &mut Cursive) -> ListView {
     let split_name_text_view = TextView::new("Split Name")
         .style(cursive::theme::Style {
             effects: EnumSet::only(cursive::theme::Effect::Bold),
@@ -257,11 +257,27 @@ pub fn build_splits_title() -> ListView {
         .h_align(HAlign::Right)
         .resized(Fixed(12), Fixed(1));
 
-    let splits_title_layout = LinearLayout::horizontal()
+    let mut splits_title_layout = LinearLayout::horizontal()
         .child(split_name_text_view)
         .child(PaddedView::lrtb(1, 0, 0, 0, split_time_text_view))
         .child(PaddedView::lrtb(1, 0, 0, 0, segment_time_text_view))
         .child(PaddedView::lrtb(1, 0, 0, 0, best_segment_text_view));
+
+    let globals = s.user_data::<GlobalState>().unwrap();
+    let comparisons = globals.splits_editor.state().comparison_names;
+    for c in comparisons {
+        let comparison_view = TextView::new(c)
+            .style(cursive::theme::Style {
+                effects: EnumSet::only(cursive::theme::Effect::Bold),
+                color: ColorStyle::default(),
+            })
+        .h_align(HAlign::Right)
+        .resized(Fixed(12), Fixed(1));
+
+        let wrapped_comparison = PaddedView::lrtb(1, 0, 0, 0, comparison_view);
+
+        splits_title_layout.add_child(wrapped_comparison)
+    }
 
     let wrapped_layout = PaddedView::lrtb(0, 0, 0, 1, splits_title_layout);
 
