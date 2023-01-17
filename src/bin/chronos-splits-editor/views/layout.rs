@@ -6,7 +6,7 @@ use crate::global_state::GlobalState;
 
 use cursive::direction::Orientation;
 use cursive::traits::{Nameable, Resizable};
-use cursive::view::SizeConstraint::{Fixed, Full};
+use cursive::view::SizeConstraint::{Full};
 use cursive::views::{Dialog, LinearLayout, Panel, ScrollView, SelectView};
 use cursive::Cursive;
 
@@ -30,14 +30,14 @@ pub fn render_layout(s: &mut Cursive) {
 
     let layout = LinearLayout::new(Orientation::Vertical)
         .child(details)
-        .child(splits::build_splits_title())
+        .child(splits::build_splits_title(s))
         .child(ScrollView::new(splits_list));
 
     let main = Dialog::around(layout)
         .title("chronos splits editor")
         .button("save", save::save_data)
         .button("close", |s| s.quit())
-        .resized(Fixed(80), Full);
+        .resized(Full, Full);
 
     s.add_layer(main);
 }

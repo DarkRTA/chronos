@@ -17,7 +17,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     let splits_file = args.splits_file.clone();
     let splits = parse_splits_file(args);
 
-    let editor = Editor::new(splits)?;
+    let mut editor = Editor::new(splits)?;
+    editor.add_comparison("BaconComparison")?;
+    editor.add_comparison("MegaComparison")?;
+    editor.add_comparison("Goal")?;
 
     let globals = GlobalState {
         splits_editor: editor,
