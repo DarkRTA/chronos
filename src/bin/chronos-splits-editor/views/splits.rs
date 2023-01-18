@@ -1,5 +1,6 @@
 use crate::error::show_error;
 use crate::global_state::GlobalState;
+use chronos::UniqueID;
 
 use cursive::align::HAlign;
 use cursive::reexports::enumset::EnumSet;
@@ -120,17 +121,25 @@ pub fn edit_split_menu(s: &mut Cursive) {
         .format(active_segment.best_segment_time())
         .to_string();
 
-    let save_split_name_edit_view =
-        EditView::new().content(name).on_submit(save_split_name);
+    let split_name_editor_id = UniqueID::new();
+    let save_split_name_edit_view = EditView::new()
+        .content(name)
+        .with_name(split_name_editor_id.to_string());
+
+    let split_time_editor_id = UniqueID::new();
     let save_split_time_edit_view = EditView::new()
         .content(split_time)
-        .on_submit(save_split_time);
+        .with_name(split_time_editor_id.to_string());
+
+    let segment_time_editor_id = UniqueID::new();
     let save_segment_time_edit_view = EditView::new()
         .content(segment_time)
-        .on_submit(save_segment_time);
+        .with_name(segment_time_editor_id.to_string());
+
+    let best_segment_time_editor_id = UniqueID::new();
     let best_segment_time_edit_view = EditView::new()
         .content(best_segment_time)
-        .on_submit(save_best_segment_time);
+        .with_name(best_segment_time_editor_id.to_string());
 
     let save_details_list_view = ListView::new()
         .child(
@@ -153,30 +162,44 @@ pub fn edit_split_menu(s: &mut Cursive) {
 
     let view = PaddedView::lrtb(0, 0, 1, 0, save_details_list_view);
 
-    let dialog =
-        Dialog::around(view)
-            .title("edit split")
-            .button("close", |s| {
-                s.pop_layer();
-            });
+    let dialog = Dialog::around(view)
+        .title("edit split")
+        .button("save", move |s| {
+            save_split_name(s, &split_name_editor_id.to_string());
+            save_split_time(s, &split_time_editor_id.to_string());
+            save_segment_time(s, &segment_time_editor_id.to_string());
+            save_best_segment_time(s, &best_segment_time_editor_id.to_string());
+            s.pop_layer();
+        })
+        .button("close", |s| {
+            s.pop_layer();
+        });
 
     s.add_layer(dialog);
 }
 
 pub fn save_split_name(s: &mut Cursive, value: &str) {
+    let edit_view = s.find_name::<EditView>(value).unwrap();
+
     let globals = s.user_data::<GlobalState>().unwrap();
+
+    let value = edit_view.get_content().to_string();
 
     globals.splits_editor.active_segment().set_name(value);
     refresh_splits(s)
 }
 
 pub fn save_split_time(s: &mut Cursive, value: &str) {
+    let edit_view = s.find_name::<EditView>(value).unwrap();
+
     let globals = s.user_data::<GlobalState>().unwrap();
+
+    let value = edit_view.get_content().to_string();
 
     match globals
         .splits_editor
         .active_segment()
-        .parse_and_set_split_time(value)
+        .parse_and_set_split_time(&value)
     {
         Ok(_timespan) => (),
         Err(error) => show_error(s, &error.to_string()),
@@ -185,12 +208,16 @@ pub fn save_split_time(s: &mut Cursive, value: &str) {
 }
 
 pub fn save_segment_time(s: &mut Cursive, value: &str) {
+    let edit_view = s.find_name::<EditView>(value).unwrap();
+
     let globals = s.user_data::<GlobalState>().unwrap();
+
+    let value = edit_view.get_content().to_string();
 
     match globals
         .splits_editor
         .active_segment()
-        .parse_and_set_segment_time(value)
+        .parse_and_set_segment_time(&value)
     {
         Ok(_timespan) => (),
         Err(error) => show_error(s, &error.to_string()),
@@ -199,12 +226,16 @@ pub fn save_segment_time(s: &mut Cursive, value: &str) {
 }
 
 pub fn save_best_segment_time(s: &mut Cursive, value: &str) {
+    let edit_view = s.find_name::<EditView>(value).unwrap();
+
     let globals = s.user_data::<GlobalState>().unwrap();
+
+    let value = edit_view.get_content().to_string();
 
     match globals
         .splits_editor
         .active_segment()
-        .parse_and_set_best_segment_time(value)
+        .parse_and_set_best_segment_time(&value)
     {
         Ok(_timespan) => (),
         Err(error) => show_error(s, &error.to_string()),
