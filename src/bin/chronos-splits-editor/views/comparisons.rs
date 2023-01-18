@@ -25,10 +25,7 @@ pub fn comparisons_menu(s: &mut Cursive) {
         let globals = s.user_data::<GlobalState>().unwrap();
         match v {
             1 => add_new_comparison(s),
-            // 1 => globals.splits_editor.remove_component(),
-            // 2 => globals.splits_editor.duplicate_component(),
-            // 3 => globals.splits_editor.move_component_up(),
-            // 4 => globals.splits_editor.move_component_down(),
+            4 => remove_comparison(s),
             _ => unreachable!(),
         }
         // refresh_layout(s);
@@ -74,6 +71,40 @@ fn add_new_comparison(s: &mut Cursive) {
                     show_error(s, &error.to_string());
                 }
             }
+        });
+
+    s.add_layer(dialog);
+}
+
+fn remove_comparison(s: &mut Cursive) {
+    let mut select_view = SelectView::<String>::new();
+
+    let globals = s.user_data::<GlobalState>().unwrap();
+
+    for (_i, c) in globals
+        .splits_editor
+        .state()
+        .comparison_names
+        .iter()
+        .enumerate()
+    {
+        select_view.add_item(c, c.to_string());
+    }
+
+    let select_view = select_view.on_submit(|s, item| {
+        let globals = s.user_data::<GlobalState>().unwrap();
+        globals.splits_editor.remove_comparison(&item);
+        splits::refresh_splits(s);
+        splits::refresh_splits_title(s);
+        s.pop_layer();
+    });
+
+    let dialog = Dialog::new()
+        .title("Enter your name")
+        .padding_lrtb(1, 1, 1, 0)
+        .content(select_view)
+        .button("cancel", |s| {
+            s.pop_layer();
         });
 
     s.add_layer(dialog);
