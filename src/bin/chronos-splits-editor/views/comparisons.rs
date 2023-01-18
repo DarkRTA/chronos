@@ -3,14 +3,10 @@ use crate::error::show_error;
 use crate::global_state::GlobalState;
 use chronos::UniqueID;
 use cursive::traits::{Nameable, Resizable};
-use cursive::views::{
-    Button, Dialog, EditView, LinearLayout, PaddedView, RadioButton,
-    RadioGroup, SelectView,
-};
+use cursive::views::{Button, Dialog, EditView, SelectView};
 use cursive::Cursive;
-use livesplit_core::util::PopulateString;
 
-pub fn build_comparison_button(s: &mut Cursive) -> Button {
+pub fn build_comparison_button(_s: &mut Cursive) -> Button {
     Button::new("Edit Comparisons", |s| comparisons_menu(s))
 }
 
@@ -22,9 +18,9 @@ pub fn comparisons_menu(s: &mut Cursive) {
     menu.add_item("Remove Comparison", 4);
 
     menu.set_on_submit(|s, v| {
-        let globals = s.user_data::<GlobalState>().unwrap();
         match v {
             1 => add_new_comparison(s),
+            3 => rename_comparison(s),
             4 => remove_comparison(s),
             _ => unreachable!(),
         }
@@ -88,7 +84,7 @@ fn remove_comparison(s: &mut Cursive) {
         .iter()
         .enumerate()
     {
-        select_view.add_item(c, c.to_string());
+        select_view.add_item_str(c.to_string());
     }
 
     let select_view = select_view.on_submit(|s, item| {
@@ -97,6 +93,69 @@ fn remove_comparison(s: &mut Cursive) {
         splits::refresh_splits(s);
         splits::refresh_splits_title(s);
         s.pop_layer();
+    });
+
+    let dialog = Dialog::new()
+        .title("Enter your name")
+        .padding_lrtb(1, 1, 1, 0)
+        .content(select_view)
+        .button("cancel", |s| {
+            s.pop_layer();
+        });
+
+    s.add_layer(dialog);
+}
+
+fn rename_comparison(s: &mut Cursive) {
+    let mut select_view = SelectView::<String>::new();
+    let globals = s.user_data::<GlobalState>().unwrap();
+
+    for (_i, c) in globals
+        .splits_editor
+        .state()
+        .comparison_names
+        .iter()
+        .enumerate()
+    {
+        select_view.add_item_str(c.to_string());
+    }
+
+    let select_view = select_view.on_submit(|s, item: &String| {
+        let editor_id = UniqueID::new();
+        let edit_view = EditView::new()
+            .content(item.to_string().clone())
+            .with_name(editor_id.to_string());
+
+        let item = item.clone();
+        let dialog = Dialog::new()
+            .title("Enter your name")
+            .padding_lrtb(1, 1, 1, 0)
+            .content(edit_view)
+            .button("save", move |s| {
+                let view =
+                    s.find_name::<EditView>(&editor_id.to_string()).unwrap();
+
+                let globals = s.user_data::<GlobalState>().unwrap();
+                match globals.splits_editor.rename_comparison(
+                    &item.to_string(),
+                    &view.get_content().to_string(),
+                ) {
+                    Ok(_v) => {
+                        splits::refresh_splits(s);
+                        splits::refresh_splits_title(s);
+                        s.pop_layer();
+                        s.pop_layer();
+                    }
+                    Err(error) => {
+                        show_error(s, &error.to_string());
+                    }
+                }
+            })
+            .button("cancel", |s| {
+                s.pop_layer();
+            });
+
+        s.add_layer(dialog);
     });
 
     let dialog = Dialog::new()
