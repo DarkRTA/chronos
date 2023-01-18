@@ -1,12 +1,16 @@
 use super::splits;
-use cursive::traits::Nameable;
-use cursive::views::{LinearLayout, PaddedView, RadioButton, RadioGroup};
+use cursive::traits::{Nameable, Resizable};
+use cursive::views::{
+    LinearLayout, PaddedView, RadioButton, RadioGroup, ResizedView,
+};
+
+use cursive::view::SizeConstraint::{Fixed, Full};
 use cursive::Cursive;
 use livesplit_core::TimingMethod;
 
 use crate::global_state::GlobalState;
 
-pub fn build_timing_methods(_s: &mut Cursive) -> LinearLayout {
+pub fn build_timing_methods(_s: &mut Cursive) -> ResizedView<LinearLayout> {
     let mut radio_group =
         RadioGroup::new().on_change(|s, _v| change_timing_method(s));
 
@@ -23,6 +27,7 @@ pub fn build_timing_methods(_s: &mut Cursive) -> LinearLayout {
     LinearLayout::horizontal()
         .child(padded_real_time_button)
         .child(game_time_button)
+        .resized(Full, Fixed(1))
 }
 
 fn change_timing_method(s: &mut Cursive) {

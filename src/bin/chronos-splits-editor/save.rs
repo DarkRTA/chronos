@@ -5,7 +5,7 @@ use livesplit_core::run::saver::livesplit::{self, IoWrite};
 use std::fs::File;
 
 pub fn save_data(s: &mut Cursive) {
-    let globals = s.user_data::<GlobalState>().unwrap();
+    let globals: GlobalState = s.take_user_data().unwrap();
     let run = globals.splits_editor.run();
     let file = File::create(&globals.splits_file)
         .expect("Failed creating save file buffer");
