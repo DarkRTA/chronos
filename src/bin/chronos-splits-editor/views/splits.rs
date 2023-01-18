@@ -17,7 +17,7 @@ use livesplit_core::timing::formatter::{
 };
 
 pub fn add_split(
-    s: &mut Cursive,
+    _s: &mut Cursive,
     splits_list: &mut SelectView<usize>,
     segment: &SegmentState,
     i: usize,
