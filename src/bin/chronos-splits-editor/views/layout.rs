@@ -29,10 +29,13 @@ pub fn render_layout(s: &mut Cursive) {
     }
 
     let splits_list = splits_list.with_name("splits_list");
+    let actions_list = LinearLayout::horizontal()
+        .child(timing::build_timing_methods(s))
+        .child(comparisons::build_comparison_button(s));
 
     let layout = LinearLayout::new(Orientation::Vertical)
         .child(details)
-        .child(timing::build_timing_methods(s))
+        .child(actions_list)
         .child(comparisons::build_comparison_button(s))
         .child(splits::build_splits_title(s))
         .child(ScrollView::new(splits_list));

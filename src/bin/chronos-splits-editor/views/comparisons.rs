@@ -2,6 +2,7 @@ use super::splits;
 use crate::error::show_error;
 use crate::global_state::GlobalState;
 use chronos::UniqueID;
+
 use cursive::traits::{Nameable, Resizable};
 use cursive::views::{Button, Dialog, EditView, SelectView};
 use cursive::Cursive;
@@ -20,6 +21,7 @@ pub fn comparisons_menu(s: &mut Cursive) {
     menu.set_on_submit(|s, v| {
         match v {
             1 => add_new_comparison(s),
+            2 => generate_goal_comparison(s),
             3 => rename_comparison(s),
             4 => remove_comparison(s),
             _ => unreachable!(),
@@ -45,7 +47,7 @@ fn add_new_comparison(s: &mut Cursive) {
         .fixed_width(20);
 
     let dialog = Dialog::new()
-        .title("Enter your name")
+        .title("Add New Comparison")
         .padding_lrtb(1, 1, 1, 0)
         .content(edit_view)
         .button("Ok", move |s| {
@@ -57,6 +59,42 @@ fn add_new_comparison(s: &mut Cursive) {
             match globals
                 .splits_editor
                 .add_comparison(edit_view.get_content().to_string())
+            {
+                Ok(_v) => {
+                    splits::refresh_splits(s);
+                    splits::refresh_splits_title(s);
+                    s.pop_layer();
+                }
+                Err(error) => {
+                    show_error(s, &error.to_string());
+                }
+            }
+        });
+
+    s.add_layer(dialog);
+}
+
+fn generate_goal_comparison(s: &mut Cursive) {
+    let editor_id = UniqueID::new();
+    let edit_view = EditView::new()
+        .with_name(editor_id.to_string())
+        .fixed_width(20);
+
+    let dialog = Dialog::new()
+        .title("Enter Goal Time")
+        .padding_lrtb(1, 1, 1, 0)
+        .content(edit_view)
+        .button("Ok", move |s| {
+            let edit_view =
+                s.find_name::<EditView>(&editor_id.to_string()).unwrap();
+
+            let globals = s.user_data::<GlobalState>().unwrap();
+
+            let content = edit_view.get_content().to_string();
+
+            match globals
+                .splits_editor
+                .parse_and_generate_goal_comparison(&content)
             {
                 Ok(_v) => {
                     splits::refresh_splits(s);
@@ -96,7 +134,7 @@ fn remove_comparison(s: &mut Cursive) {
     });
 
     let dialog = Dialog::new()
-        .title("Enter your name")
+        .title("Remove Comparison")
         .padding_lrtb(1, 1, 1, 0)
         .content(select_view)
         .button("cancel", |s| {
@@ -128,7 +166,7 @@ fn rename_comparison(s: &mut Cursive) {
 
         let item = item.clone();
         let dialog = Dialog::new()
-            .title("Enter your name")
+            .title("Rename Comparison")
             .padding_lrtb(1, 1, 1, 0)
             .content(edit_view)
             .button("save", move |s| {
