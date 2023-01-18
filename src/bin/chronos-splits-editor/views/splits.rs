@@ -4,10 +4,11 @@ use crate::global_state::GlobalState;
 use cursive::align::HAlign;
 use cursive::reexports::enumset::EnumSet;
 use cursive::theme::ColorStyle;
-use cursive::traits::Resizable;
+use cursive::traits::{Nameable, Resizable};
 use cursive::view::SizeConstraint::{AtLeast, Fixed};
 use cursive::views::{
-    Dialog, EditView, LinearLayout, ListView, PaddedView, SelectView, TextView,
+    Dialog, EditView, LinearLayout, ListView, NamedView, PaddedView,
+    SelectView, TextView,
 };
 use cursive::Cursive;
 use livesplit_core::run::editor::{SegmentState, SelectionState};
@@ -16,14 +17,15 @@ use livesplit_core::timing::formatter::{
 };
 
 pub fn add_split(
+    s: &mut Cursive,
     splits_list: &mut SelectView<usize>,
-    s: &SegmentState,
+    segment: &SegmentState,
     i: usize,
 ) {
-    let name = format!("{:<37}", s.name);
-    let mut split_time = format!("{:>11}", s.split_time);
-    let mut segment_time = format!("{:>13}", s.segment_time);
-    let mut best_segment_time = format!("{:>13}", s.best_segment_time);
+    let name = format!("{:<37}", segment.name);
+    let mut split_time = format!("{:>11}", segment.split_time);
+    let mut segment_time = format!("{:>13}", segment.segment_time);
+    let mut best_segment_time = format!("{:>13}", segment.best_segment_time);
 
     if split_time.trim() == "" {
         split_time = format!("{:>11}", "—");
@@ -35,10 +37,20 @@ pub fn add_split(
         best_segment_time = format!("{:>13}", "—");
     }
 
-    let formatted = format!(
-        "{}{}{}{}{}{}{}",
-        name, split_time, segment_time, best_segment_time, best_segment_time, best_segment_time, best_segment_time
+    let mut formatted = format!(
+        "{}{}{}{}",
+        name, split_time, segment_time, best_segment_time
     );
+
+    // reduce comparisons into formatted text
+    segment.comparison_times.clone().iter_mut().for_each(|c| {
+        let mut comparison = format!("{:>13}", c);
+        if comparison.trim() == "" {
+            comparison = format!("{:>13}", "—");
+        }
+        formatted = format!("{}{}", formatted, comparison);
+    });
+
     splits_list.add_item(formatted, i);
 }
 
@@ -212,19 +224,38 @@ pub fn refresh_splits(s: &mut Cursive) {
 
     let segments = state.segments;
     let mut selected_index = 0;
-    for (i, s) in segments.iter().enumerate() {
-        match s.selected {
+    for (i, segment) in segments.iter().enumerate() {
+        match segment.selected {
             SelectionState::Active | SelectionState::Selected => {
                 selected_index = i
             }
             _ => (),
         }
-        add_split(&mut splits_list, s, i)
+        add_split(s, &mut splits_list, segment, i)
     }
     splits_list.set_selection(selected_index as usize);
 }
 
-pub fn build_splits_title(s: &mut Cursive) -> ListView {
+pub fn refresh_splits_title(s: &mut Cursive) {
+    /* splits list */
+    let mut splits_title = s.find_name::<ListView>("splits_title").unwrap();
+
+    let wrapped_layout = build_splits_title_wrapped_layout(s);
+    splits_title.clear();
+    splits_title.add_child("", wrapped_layout);
+}
+
+pub fn build_splits_title(s: &mut Cursive) -> NamedView<ListView> {
+    let wrapped_layout = build_splits_title_wrapped_layout(s);
+
+    ListView::new()
+        .child("", wrapped_layout)
+        .with_name("splits_title")
+}
+
+pub fn build_splits_title_wrapped_layout(
+    s: &mut Cursive,
+) -> PaddedView<LinearLayout> {
     let split_name_text_view = TextView::new("Split Name")
         .style(cursive::theme::Style {
             effects: EnumSet::only(cursive::theme::Effect::Bold),
@@ -271,15 +302,13 @@ pub fn build_splits_title(s: &mut Cursive) -> ListView {
                 effects: EnumSet::only(cursive::theme::Effect::Bold),
                 color: ColorStyle::default(),
             })
-        .h_align(HAlign::Right)
-        .resized(Fixed(12), Fixed(1));
+            .h_align(HAlign::Right)
+            .resized(Fixed(12), Fixed(1));
 
         let wrapped_comparison = PaddedView::lrtb(1, 0, 0, 0, comparison_view);
 
         splits_title_layout.add_child(wrapped_comparison)
     }
 
-    let wrapped_layout = PaddedView::lrtb(0, 0, 0, 1, splits_title_layout);
-
-    ListView::new().child("", wrapped_layout)
+    PaddedView::lrtb(0, 0, 0, 1, splits_title_layout)
 }

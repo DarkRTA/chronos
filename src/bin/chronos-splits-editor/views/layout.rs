@@ -1,12 +1,14 @@
+use super::comparisons;
 use super::details;
 use super::splits;
+use super::timing;
 use crate::save;
 
 use crate::global_state::GlobalState;
 
 use cursive::direction::Orientation;
 use cursive::traits::{Nameable, Resizable};
-use cursive::view::SizeConstraint::{Full};
+use cursive::view::SizeConstraint::Full;
 use cursive::views::{Dialog, LinearLayout, Panel, ScrollView, SelectView};
 use cursive::Cursive;
 
@@ -22,14 +24,16 @@ pub fn render_layout(s: &mut Cursive) {
     let globals = s.user_data::<GlobalState>().unwrap();
 
     let segments = globals.splits_editor.state().segments;
-    for (i, s) in segments.iter().enumerate() {
-        splits::add_split(&mut splits_list, s, i)
+    for (i, segment) in segments.iter().enumerate() {
+        splits::add_split(s, &mut splits_list, segment, i)
     }
 
     let splits_list = splits_list.with_name("splits_list");
 
     let layout = LinearLayout::new(Orientation::Vertical)
         .child(details)
+        .child(timing::build_timing_methods(s))
+        .child(comparisons::build_comparison_button(s))
         .child(splits::build_splits_title(s))
         .child(ScrollView::new(splits_list));
 
