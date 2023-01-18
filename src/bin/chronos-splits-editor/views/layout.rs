@@ -36,7 +36,6 @@ pub fn render_layout(s: &mut Cursive) {
     let layout = LinearLayout::new(Orientation::Vertical)
         .child(details)
         .child(actions_list)
-        .child(comparisons::build_comparison_button(s))
         .child(splits::build_splits_title(s))
         .child(ScrollView::new(splits_list));
 

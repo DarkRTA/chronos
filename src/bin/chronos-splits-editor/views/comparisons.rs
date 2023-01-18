@@ -50,7 +50,7 @@ fn add_new_comparison(s: &mut Cursive) {
         .title("Add New Comparison")
         .padding_lrtb(1, 1, 1, 0)
         .content(edit_view)
-        .button("Ok", move |s| {
+        .button("save", move |s| {
             let edit_view =
                 s.find_name::<EditView>(&editor_id.to_string()).unwrap();
 
@@ -69,6 +69,9 @@ fn add_new_comparison(s: &mut Cursive) {
                     show_error(s, &error.to_string());
                 }
             }
+        })
+        .button("close", |s| {
+            s.pop_layer();
         });
 
     s.add_layer(dialog);
@@ -84,7 +87,7 @@ fn generate_goal_comparison(s: &mut Cursive) {
         .title("Enter Goal Time")
         .padding_lrtb(1, 1, 1, 0)
         .content(edit_view)
-        .button("Ok", move |s| {
+        .button("save", move |s| {
             let edit_view =
                 s.find_name::<EditView>(&editor_id.to_string()).unwrap();
 
@@ -105,6 +108,9 @@ fn generate_goal_comparison(s: &mut Cursive) {
                     show_error(s, &error.to_string());
                 }
             }
+        })
+        .button("close", |s| {
+            s.pop_layer();
         });
 
     s.add_layer(dialog);
@@ -189,7 +195,7 @@ fn rename_comparison(s: &mut Cursive) {
                     }
                 }
             })
-            .button("cancel", |s| {
+            .button("close", |s| {
                 s.pop_layer();
             });
 
@@ -200,7 +206,7 @@ fn rename_comparison(s: &mut Cursive) {
         .title("Enter your name")
         .padding_lrtb(1, 1, 1, 0)
         .content(select_view)
-        .button("cancel", |s| {
+        .button("close", |s| {
             s.pop_layer();
         });
 
