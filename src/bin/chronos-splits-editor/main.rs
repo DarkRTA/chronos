@@ -17,14 +17,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     let splits_file = args.splits_file.clone();
     let splits = parse_splits_file(args);
 
-    let mut editor = Editor::new(splits)?;
-    editor.add_comparison("BaconComparison")?;
-    editor.add_comparison("MegaComparison")?;
-    editor.add_comparison("Goal")?;
+    let editor = Editor::new(splits)?;
 
     let globals = GlobalState {
         splits_editor: editor,
-        splits_file: splits_file,
+        splits_file,
     };
 
     let backend = {
