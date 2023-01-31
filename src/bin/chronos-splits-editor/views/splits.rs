@@ -8,7 +8,7 @@ use cursive::theme::ColorStyle;
 use cursive::traits::{Nameable, Resizable};
 use cursive::view::SizeConstraint::{AtLeast, Fixed};
 use cursive::views::{
-    Dialog, EditView, LinearLayout, ListView, NamedView, PaddedView,
+    Button, Dialog, EditView, LinearLayout, ListView, NamedView, PaddedView,
     SelectView, TextView,
 };
 use cursive::Cursive;
@@ -121,55 +121,87 @@ pub fn edit_split_menu(s: &mut Cursive) {
         .format(active_segment.best_segment_time())
         .to_string();
 
-    let split_name_editor_id = UniqueID::new();
-    let save_split_name_edit_view = EditView::new()
-        .content(name)
-        .with_name(split_name_editor_id.to_string());
-
-    let split_time_editor_id = UniqueID::new();
-    let save_split_time_edit_view = EditView::new()
-        .content(split_time)
-        .with_name(split_time_editor_id.to_string());
-
-    let segment_time_editor_id = UniqueID::new();
-    let save_segment_time_edit_view = EditView::new()
-        .content(segment_time)
-        .with_name(segment_time_editor_id.to_string());
-
-    let best_segment_time_editor_id = UniqueID::new();
-    let best_segment_time_edit_view = EditView::new()
-        .content(best_segment_time)
-        .with_name(best_segment_time_editor_id.to_string());
-
     let save_details_list_view = ListView::new()
         .child(
             "Name",
-            PaddedView::lrtb(0, 0, 0, 1, save_split_name_edit_view),
+            LinearLayout::horizontal().child(
+                Button::new(name, move |s| edit_split_name_view(s))
+                    .with_name("edit_split_name_button"),
+            ),
         )
         .child(
             "Split Time",
-            PaddedView::lrtb(0, 0, 0, 1, save_split_time_edit_view),
+            LinearLayout::horizontal().child(
+                Button::new(split_time, move |s| edit_split_time_view(s))
+                    .with_name("edit_split_time_button"),
+            ),
         )
         .child(
             "Segment Time",
-            PaddedView::lrtb(0, 0, 0, 1, save_segment_time_edit_view),
+            LinearLayout::horizontal().child(
+                Button::new(segment_time, move |s| edit_segment_time_view(s))
+                    .with_name("edit_segment_time_button"),
+            ),
         )
         .child(
             "Best Segment",
-            PaddedView::lrtb(0, 0, 0, 1, best_segment_time_edit_view),
+            LinearLayout::horizontal().child(
+                Button::new(best_segment_time, move |s| {
+                    edit_best_segment_time_view(s)
+                })
+                .with_name("edit_best_segment_time_button"),
+            ),
         )
         .resized(AtLeast(40), AtLeast(10));
 
     let view = PaddedView::lrtb(0, 0, 1, 0, save_details_list_view);
 
+    let dialog =
+        Dialog::around(view)
+            .title("edit split")
+            .button("close", |s| {
+                s.pop_layer();
+            });
+
+    s.add_layer(dialog);
+}
+
+pub fn edit_split_name_view(s: &mut Cursive) {
+    let editor_id = UniqueID::new();
+    let globals = s.user_data::<GlobalState>().unwrap();
+    let name = globals.splits_editor.active_segment().name().to_string();
+    let split_name_edit_view = EditView::new()
+        .content(name.to_string())
+        .with_name(editor_id.to_string());
+
+    let split_name_list_view = ListView::new()
+        .child("", PaddedView::lrtb(0, 0, 0, 1, split_name_edit_view));
+
+    let view = PaddedView::lrtb(0, 0, 1, 0, split_name_list_view)
+        .resized(AtLeast(40), AtLeast(10));
+
     let dialog = Dialog::around(view)
-        .title("edit split")
+        .title("edit split name")
         .button("save", move |s| {
-            save_split_name(s, &split_name_editor_id.to_string());
-            save_split_time(s, &split_time_editor_id.to_string());
-            save_segment_time(s, &segment_time_editor_id.to_string());
-            save_best_segment_time(s, &best_segment_time_editor_id.to_string());
-            s.pop_layer();
+            let edit_view =
+                s.find_name::<EditView>(&editor_id.to_string()).unwrap();
+
+            let value = edit_view.get_content();
+            let globals = s.user_data::<GlobalState>().unwrap();
+
+            globals
+                .splits_editor
+                .active_segment()
+                .set_name(value.to_string());
+
+            let mut button =
+                s.find_name::<Button>("edit_split_name_button").unwrap();
+
+            button.set_label(value.to_string());
+            refresh_splits(s);
+            match s.pop_layer() {
+                _ => (),
+            }
         })
         .button("close", |s| {
             s.pop_layer();
@@ -178,69 +210,160 @@ pub fn edit_split_menu(s: &mut Cursive) {
     s.add_layer(dialog);
 }
 
-pub fn save_split_name(s: &mut Cursive, value: &str) {
-    let edit_view = s.find_name::<EditView>(value).unwrap();
-
+pub fn edit_split_time_view(s: &mut Cursive) {
+    let editor_id = UniqueID::new();
     let globals = s.user_data::<GlobalState>().unwrap();
+    let formatter = NoneWrapper::new(SegmentTime::new(), "");
+    let active_segment = globals.splits_editor.active_segment();
+    let split_time = formatter.format(active_segment.split_time()).to_string();
+    let split_time_edit_view = EditView::new()
+        .content(split_time.to_string())
+        .with_name(editor_id.to_string());
 
-    let value = edit_view.get_content().to_string();
+    let split_time_list_view = ListView::new()
+        .child("", PaddedView::lrtb(0, 0, 0, 1, split_time_edit_view));
 
-    globals.splits_editor.active_segment().set_name(value);
-    refresh_splits(s)
+    let view = PaddedView::lrtb(0, 0, 1, 0, split_time_list_view)
+        .resized(AtLeast(40), AtLeast(10));
+
+    let dialog = Dialog::around(view)
+        .title("edit split time")
+        .button("save", move |s| {
+            let edit_view =
+                s.find_name::<EditView>(&editor_id.to_string()).unwrap();
+
+            let value = edit_view.get_content();
+            let globals = s.user_data::<GlobalState>().unwrap();
+
+            match globals
+                .splits_editor
+                .active_segment()
+                .parse_and_set_split_time(&value)
+            {
+                Ok(_timespan) => (),
+                Err(error) => show_error(s, &error.to_string()),
+            };
+
+            let mut button =
+                s.find_name::<Button>("edit_split_time_button").unwrap();
+
+            button.set_label(value.to_string());
+            refresh_splits(s);
+            match s.pop_layer() {
+                _ => (),
+            }
+        })
+        .button("close", |s| {
+            s.pop_layer();
+        });
+
+    s.add_layer(dialog);
 }
 
-pub fn save_split_time(s: &mut Cursive, value: &str) {
-    let edit_view = s.find_name::<EditView>(value).unwrap();
-
+pub fn edit_best_segment_time_view(s: &mut Cursive) {
+    let editor_id = UniqueID::new();
     let globals = s.user_data::<GlobalState>().unwrap();
+    let formatter = NoneWrapper::new(SegmentTime::new(), "");
+    let active_segment = globals.splits_editor.active_segment();
+    let best_segment_time = formatter
+        .format(active_segment.best_segment_time())
+        .to_string();
+    let best_segment_time_edit_view = EditView::new()
+        .content(best_segment_time.to_string())
+        .with_name(editor_id.to_string());
 
-    let value = edit_view.get_content().to_string();
+    let best_segment_time_list_view = ListView::new().child(
+        "",
+        PaddedView::lrtb(0, 0, 0, 1, best_segment_time_edit_view),
+    );
 
-    match globals
-        .splits_editor
-        .active_segment()
-        .parse_and_set_split_time(&value)
-    {
-        Ok(_timespan) => (),
-        Err(error) => show_error(s, &error.to_string()),
-    };
-    refresh_splits(s)
+    let view = PaddedView::lrtb(0, 0, 1, 0, best_segment_time_list_view)
+        .resized(AtLeast(40), AtLeast(10));
+
+    let dialog = Dialog::around(view)
+        .title("edit split time")
+        .button("save", move |s| {
+            let edit_view =
+                s.find_name::<EditView>(&editor_id.to_string()).unwrap();
+
+            let value = edit_view.get_content();
+            let globals = s.user_data::<GlobalState>().unwrap();
+
+            match globals
+                .splits_editor
+                .active_segment()
+                .parse_and_set_best_segment_time(&value)
+            {
+                Ok(_timespan) => (),
+                Err(error) => show_error(s, &error.to_string()),
+            };
+
+            let mut button = s
+                .find_name::<Button>("edit_best_segment_time_button")
+                .unwrap();
+
+            button.set_label(value.to_string());
+            refresh_splits(s);
+            match s.pop_layer() {
+                _ => (),
+            }
+        })
+        .button("close", |s| {
+            s.pop_layer();
+        });
+
+    s.add_layer(dialog);
 }
 
-pub fn save_segment_time(s: &mut Cursive, value: &str) {
-    let edit_view = s.find_name::<EditView>(value).unwrap();
-
+pub fn edit_segment_time_view(s: &mut Cursive) {
+    let editor_id = UniqueID::new();
     let globals = s.user_data::<GlobalState>().unwrap();
+    let formatter = NoneWrapper::new(SegmentTime::new(), "");
+    let active_segment = globals.splits_editor.active_segment();
+    let segment_time =
+        formatter.format(active_segment.segment_time()).to_string();
+    let segment_time_edit_view = EditView::new()
+        .content(segment_time.to_string())
+        .with_name(editor_id.to_string());
 
-    let value = edit_view.get_content().to_string();
+    let segment_time_list_view = ListView::new()
+        .child("", PaddedView::lrtb(0, 0, 0, 1, segment_time_edit_view));
 
-    match globals
-        .splits_editor
-        .active_segment()
-        .parse_and_set_segment_time(&value)
-    {
-        Ok(_timespan) => (),
-        Err(error) => show_error(s, &error.to_string()),
-    };
-    refresh_splits(s)
-}
+    let view = PaddedView::lrtb(0, 0, 1, 0, segment_time_list_view)
+        .resized(AtLeast(40), AtLeast(10));
 
-pub fn save_best_segment_time(s: &mut Cursive, value: &str) {
-    let edit_view = s.find_name::<EditView>(value).unwrap();
+    let dialog = Dialog::around(view)
+        .title("edit split time")
+        .button("save", move |s| {
+            let edit_view =
+                s.find_name::<EditView>(&editor_id.to_string()).unwrap();
 
-    let globals = s.user_data::<GlobalState>().unwrap();
+            let value = edit_view.get_content();
+            let globals = s.user_data::<GlobalState>().unwrap();
 
-    let value = edit_view.get_content().to_string();
+            match globals
+                .splits_editor
+                .active_segment()
+                .parse_and_set_segment_time(&value)
+            {
+                Ok(_timespan) => (),
+                Err(error) => show_error(s, &error.to_string()),
+            };
 
-    match globals
-        .splits_editor
-        .active_segment()
-        .parse_and_set_best_segment_time(&value)
-    {
-        Ok(_timespan) => (),
-        Err(error) => show_error(s, &error.to_string()),
-    };
-    refresh_splits(s)
+            let mut button =
+                s.find_name::<Button>("edit_segment_time_button").unwrap();
+
+            button.set_label(value.to_string());
+            refresh_splits(s);
+            match s.pop_layer() {
+                _ => (),
+            }
+        })
+        .button("close", |s| {
+            s.pop_layer();
+        });
+
+    s.add_layer(dialog);
 }
 
 pub fn refresh_splits(s: &mut Cursive) {
