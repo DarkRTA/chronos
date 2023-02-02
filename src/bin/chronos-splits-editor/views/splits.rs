@@ -194,10 +194,6 @@ pub fn edit_split_name_view(s: &mut Cursive) {
                 .active_segment()
                 .set_name(value.to_string());
 
-            let mut button =
-                s.find_name::<Button>("edit_split_name_button").unwrap();
-
-            button.set_label(value.to_string());
             refresh_splits(s);
             match s.pop_layer() {
                 _ => (),
@@ -244,11 +240,7 @@ pub fn edit_split_time_view(s: &mut Cursive) {
                 Err(error) => show_error(s, &error.to_string()),
             };
 
-            let mut button =
-                s.find_name::<Button>("edit_split_time_button").unwrap();
-
-            button.set_label(value.to_string());
-            refresh_splits(s);
+            refresh_edit_split_times(s);
             match s.pop_layer() {
                 _ => (),
             }
@@ -298,12 +290,7 @@ pub fn edit_best_segment_time_view(s: &mut Cursive) {
                 Err(error) => show_error(s, &error.to_string()),
             };
 
-            let mut button = s
-                .find_name::<Button>("edit_best_segment_time_button")
-                .unwrap();
-
-            button.set_label(value.to_string());
-            refresh_splits(s);
+            refresh_edit_split_times(s);
             match s.pop_layer() {
                 _ => (),
             }
@@ -350,11 +337,7 @@ pub fn edit_segment_time_view(s: &mut Cursive) {
                 Err(error) => show_error(s, &error.to_string()),
             };
 
-            let mut button =
-                s.find_name::<Button>("edit_segment_time_button").unwrap();
-
-            button.set_label(value.to_string());
-            refresh_splits(s);
+            refresh_edit_split_times(s);
             match s.pop_layer() {
                 _ => (),
             }
@@ -397,6 +380,47 @@ pub fn refresh_splits_title(s: &mut Cursive) {
     let wrapped_layout = build_splits_title_wrapped_layout(s);
     splits_title.clear();
     splits_title.add_child("", wrapped_layout);
+}
+
+pub fn refresh_edit_split_times(s: &mut Cursive) {
+    {
+        let globals = s.user_data::<GlobalState>().unwrap();
+        let active_segment = globals.splits_editor.active_segment();
+        let formatter = NoneWrapper::new(SegmentTime::new(), "");
+        let split_time =
+            formatter.format(active_segment.split_time()).to_string();
+
+        s.find_name::<Button>("edit_split_time_button")
+            .unwrap()
+            .set_label(split_time.to_string());
+    }
+
+    {
+        let globals = s.user_data::<GlobalState>().unwrap();
+        let active_segment = globals.splits_editor.active_segment();
+        let formatter = NoneWrapper::new(SegmentTime::new(), "");
+        let segment_time =
+            formatter.format(active_segment.segment_time()).to_string();
+        s.find_name::<Button>("edit_segment_time_button")
+            .unwrap()
+            .set_label(segment_time.to_string());
+    }
+
+    {
+        let globals = s.user_data::<GlobalState>().unwrap();
+        let active_segment = globals.splits_editor.active_segment();
+        let formatter = NoneWrapper::new(SegmentTime::new(), "");
+        let best_segment_time = formatter
+            .format(active_segment.best_segment_time())
+            .to_string();
+        let mut button = s
+            .find_name::<Button>("edit_best_segment_time_button")
+            .unwrap();
+
+        button.set_label(best_segment_time.to_string());
+    }
+
+    refresh_splits(s);
 }
 
 pub fn build_splits_title(s: &mut Cursive) -> NamedView<ListView> {
