@@ -111,6 +111,7 @@ pub fn on_splits_select(s: &mut Cursive, _v: &usize) {
 pub fn edit_split_menu(s: &mut Cursive) {
     let globals = s.user_data::<GlobalState>().unwrap();
 
+    let state = globals.splits_editor.state();
     let formatter = NoneWrapper::new(SegmentTime::new(), "");
     let active_segment = globals.splits_editor.active_segment();
     let name = active_segment.name();
@@ -121,7 +122,7 @@ pub fn edit_split_menu(s: &mut Cursive) {
         .format(active_segment.best_segment_time())
         .to_string();
 
-    let save_details_list_view = ListView::new()
+    let mut save_details_list_view = ListView::new()
         .child(
             "Name",
             LinearLayout::horizontal().child(
@@ -151,8 +152,30 @@ pub fn edit_split_menu(s: &mut Cursive) {
                 })
                 .with_name("edit_best_segment_time_button"),
             ),
-        )
-        .resized(AtLeast(40), AtLeast(10));
+        );
+
+    // reduce comparisons into formatted text
+    for c in state.comparison_names {
+        let button_name =
+            format!("{}_edit_comparison_time_button", c.to_string());
+        let value = format!(
+            "{}",
+            formatter
+                .format(active_segment.comparison_time(&c))
+                .to_string()
+        );
+        save_details_list_view.add_child(
+            &c.clone(),
+            LinearLayout::horizontal().child(
+                Button::new(value.to_string(), move |s| {
+                    edit_comparison_time_view(s, &c, &value)
+                })
+                .with_name(button_name),
+            ),
+        );
+    }
+
+    // save_details_list_view.resized(AtLeast(40), AtLeast(10));
 
     let view = PaddedView::lrtb(0, 0, 1, 0, save_details_list_view);
 
@@ -162,6 +185,47 @@ pub fn edit_split_menu(s: &mut Cursive) {
             .button("close", |s| {
                 s.pop_layer();
             });
+
+    s.add_layer(dialog);
+}
+
+pub fn edit_comparison_time_view(s: &mut Cursive, name: &str, value: &str) {
+    let editor_id = UniqueID::new();
+    let n = name.to_string();
+    let split_name_edit_view = EditView::new()
+        .content(value.to_string())
+        .with_name(editor_id.to_string());
+
+    let split_name_list_view = ListView::new()
+        .child("", PaddedView::lrtb(0, 0, 0, 1, split_name_edit_view));
+
+    let view = PaddedView::lrtb(0, 0, 1, 0, split_name_list_view)
+        .resized(AtLeast(40), AtLeast(10));
+
+    let dialog = Dialog::around(view)
+        .title("edit split name")
+        .button("save", move |s| {
+            let edit_view =
+                s.find_name::<EditView>(&editor_id.to_string()).unwrap();
+
+            let value = edit_view.get_content();
+            let globals = s.user_data::<GlobalState>().unwrap();
+
+            match globals
+                .splits_editor
+                .active_segment()
+                .parse_and_set_comparison_time(&n, &value)
+            {
+                Ok(_) => {
+                    refresh_edit_split_times(s);
+                    s.pop_layer();
+                }
+                Err(error) => show_error(s, &error.to_string()),
+            }
+        })
+        .button("close", |s| {
+            s.pop_layer();
+        });
 
     s.add_layer(dialog);
 }
@@ -418,6 +482,24 @@ pub fn refresh_edit_split_times(s: &mut Cursive) {
             .unwrap();
 
         button.set_label(best_segment_time.to_string());
+    }
+    {
+        // comparison times
+        let globals = s.user_data::<GlobalState>().unwrap();
+        for c in globals.splits_editor.state().comparison_names {
+            let globals = s.user_data::<GlobalState>().unwrap();
+            let active_segment = globals.splits_editor.active_segment();
+            let formatter = NoneWrapper::new(SegmentTime::new(), "");
+            let comparison_time = formatter
+                .format(active_segment.comparison_time(&c))
+                .to_string();
+
+            let button_name =
+                format!("{}_edit_comparison_time_button", c.to_string());
+            let mut button = s.find_name::<Button>(&button_name).unwrap();
+
+            button.set_label(comparison_time.to_string());
+        }
     }
 
     refresh_splits(s);
