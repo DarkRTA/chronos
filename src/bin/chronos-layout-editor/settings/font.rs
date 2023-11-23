@@ -34,6 +34,7 @@ pub fn edit_font(
             let style = match x.style {
                 FontStyle::Normal => 0,
                 FontStyle::Italic => 1,
+                FontStyle::Oblique => 2,
             };
 
             let weight = match x.weight {
@@ -71,6 +72,7 @@ pub fn edit_font(
     let mut style_buttons = [
         style_group.button(FontStyle::Normal, "Normal"),
         style_group.button(FontStyle::Italic, "Italic"),
+        style_group.button(FontStyle::Oblique, "Oblique"),
     ];
     style_buttons[style].select();
 

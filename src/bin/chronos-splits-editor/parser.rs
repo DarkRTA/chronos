@@ -19,8 +19,8 @@ pub fn parse_splits_file(args: Args) -> Run {
 
     match fs::read(path) {
         Ok(file) => {
-            let parsed = composite::parse(&file, None, false)
-                .expect("Not a valid splits file");
+            let parsed =
+                composite::parse(&file, None).expect("Not a valid splits file");
             parsed.run
         }
         Err(_) => default_run(),

@@ -207,11 +207,11 @@ pub fn edit_gradient(
 
         let Ok(color_1) = parse_color(&color1_input.get_content()) else {
             show_error(s, "Error parsing color");
-            return
+            return;
         };
         let Ok(color_2) = parse_color(&color2_input.get_content()) else {
             show_error(s, "Error parsing color");
-            return
+            return;
         };
 
         let value = Value::from(match *variant_group.selection() {
@@ -313,11 +313,11 @@ pub fn edit_list_gradient(
 
         let Ok(color_1) = parse_color(&color1_input.get_content()) else {
             show_error(s, "Error parsing color");
-            return
+            return;
         };
         let Ok(color_2) = parse_color(&color2_input.get_content()) else {
             show_error(s, "Error parsing color");
-            return
+            return;
         };
 
         let value = Value::from(match *variant_group.selection() {
@@ -428,11 +428,11 @@ pub fn edit_delta_gradient(
 
         let Ok(color_1) = parse_color(&color1_input.get_content()) else {
             show_error(s, "Error parsing color");
-            return
+            return;
         };
         let Ok(color_2) = parse_color(&color2_input.get_content()) else {
             show_error(s, "Error parsing color");
-            return
+            return;
         };
 
         let value = Value::from(match *variant_group.selection() {

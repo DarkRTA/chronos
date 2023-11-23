@@ -4,6 +4,7 @@ use std::fs::{self};
 use std::io::stdout;
 use std::io::BufWriter;
 use std::io::Cursor;
+use std::path::Path;
 use std::time::Duration;
 
 use clap::Parser;
@@ -61,12 +62,9 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let args = Args::parse();
     let splits_file = fs::read(&args.splits)?;
-    let run = parser::composite::parse(
-        &splits_file,
-        Some((&args.splits).into()),
-        true,
-    )?
-    .run;
+    let run =
+        parser::composite::parse(&splits_file, Some(&Path::new(&args.splits)))?
+            .run;
     let stimer = Timer::new(run)?.into_shared();
 
     let mut layout = match args.layout {
